@@ -9,6 +9,18 @@
     {
       "source": "/join/(.*)",
       "destination": "https://apis.buzzel.dpdns.org/join/$1"
+    },
+    {
+      "source": "/register",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
     }
   ]
 }

@@ -103,6 +103,37 @@ const el = {
   otpForm: document.getElementById('otpForm'),
   otpCode: document.getElementById('otpCode'),
   otpPhone: document.getElementById('otpPhone'),
+  registerScreen: document.getElementById('registerScreen'),
+  btnGoToRegister: document.getElementById('btnGoToRegister'),
+  wizardForm: document.getElementById('wizardForm'),
+  wizName: document.getElementById('wizName'),
+  wizPhone: document.getElementById('wizPhone'),
+  wizQris: document.getElementById('wizQris'),
+  wizPin: document.getElementById('wizPin'),
+  wizPinConfirm: document.getElementById('wizPinConfirm'),
+  wizError: document.getElementById('wizError'),
+  wizCancelBtn: document.getElementById('wizCancelBtn'),
+  wizStep1NextBtn: document.getElementById('wizStep1NextBtn'),
+  wizStep2BackBtn: document.getElementById('wizStep2BackBtn'),
+  wizStep2NextBtn: document.getElementById('wizStep2NextBtn'),
+  wizStep3BackBtn: document.getElementById('wizStep3BackBtn'),
+  wizSubmitBtn: document.getElementById('wizSubmitBtn'),
+  wizQrisPreview: document.getElementById('wizQrisPreview'),
+  wizQrisMerchantName: document.getElementById('wizQrisMerchantName'),
+  wizQrisCity: document.getElementById('wizQrisCity'),
+  pinModalOverlay: document.getElementById('pinModalOverlay'),
+  modalPinInput: document.getElementById('modalPinInput'),
+  pinModalForm: document.getElementById('pinModalForm'),
+  pinModalError: document.getElementById('pinModalError'),
+  pinModalCancelBtn: document.getElementById('pinModalCancelBtn'),
+  pinModalSubmitBtn: document.getElementById('pinModalSubmitBtn'),
+  pinModalProfileName: document.getElementById('pinModalProfileName'),
+  adminModalOverlay: document.getElementById('adminModalOverlay'),
+  modalAdminPasswordInput: document.getElementById('modalAdminPasswordInput'),
+  adminModalForm: document.getElementById('adminModalForm'),
+  adminModalError: document.getElementById('adminModalError'),
+  adminModalCancelBtn: document.getElementById('adminModalCancelBtn'),
+  adminModalSubmitBtn: document.getElementById('adminModalSubmitBtn'),
   statPending: document.getElementById('statPending'),
   statTotal: document.getElementById('statTotal'),
   statPaid: document.getElementById('statPaid'),
@@ -356,11 +387,19 @@ async function boot() {
     }
 
     if (!session.profile) {
-      await showProfiles();
+      if (window.location.pathname === '/register') {
+        showRegisterWizard();
+      } else {
+        await showProfiles();
+      }
       return;
     }
 
     state.profile = session.profile;
+    if (window.location.pathname === '/register') {
+      showRegisterWizard();
+      return;
+    }
     await startApp();
   } catch (err) {
     console.error('Boot error:', err);
@@ -374,6 +413,7 @@ async function showProfiles(message) {
   stopTimers();
   el.gate.hidden = true;
   el.app.hidden = true;
+  if (el.registerScreen) el.registerScreen.hidden = true;
   el.profiles.hidden = false;
   document.title = 'Pilih profil — GoPay Bill';
   window.scrollTo(0, 0);
@@ -387,7 +427,7 @@ async function loadProfiles() {
   try {
     const data = await api('/api/profiles');
     renderProfiles(data.profiles || []);
-    el.profileCreate.open = (data.profiles || []).length === 0;
+    if (el.profileCreate) el.profileCreate.open = (data.profiles || []).length === 0;
   } catch (err) {
     el.profileList.replaceChildren(createHint(err.message));
   }
@@ -452,12 +492,22 @@ function renderProfiles(profiles) {
 
     meta.append(pill, go);
     item.append(main, meta);
-    item.addEventListener('click', () => selectProfile(profile.id));
+    item.addEventListener('click', () => {
+      if (profile.has_pin) {
+        openPinModal(profile.id, profile.name);
+      } else {
+        selectProfile(profile.id, '', profile.name);
+      }
+    });
     item.addEventListener('keydown', (event) => {
       if (event.target !== item) return;
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        selectProfile(profile.id);
+        if (profile.has_pin) {
+          openPinModal(profile.id, profile.name);
+        } else {
+          selectProfile(profile.id, '', profile.name);
+        }
       }
     });
 
@@ -465,24 +515,139 @@ function renderProfiles(profiles) {
   }
 }
 
-async function selectProfile(id, pin = '') {
+// ── Custom Modals: PIN Profil & Admin Password ──────────────────────────────
+let pendingPinProfileId = null;
+
+function openPinModal(profileId, profileName = '') {
+  pendingPinProfileId = profileId;
+  if (el.pinModalProfileName) el.pinModalProfileName.textContent = profileName || 'Toko';
+  if (el.modalPinInput) el.modalPinInput.value = '';
+  if (el.pinModalError) el.pinModalError.hidden = true;
+  if (el.pinModalOverlay) el.pinModalOverlay.classList.remove('hidden');
+  setTimeout(() => el.modalPinInput?.focus(), 50);
+}
+
+function closePinModal() {
+  pendingPinProfileId = null;
+  if (el.pinModalOverlay) el.pinModalOverlay.classList.add('hidden');
+}
+
+function openAdminModal() {
+  if (el.modalAdminPasswordInput) el.modalAdminPasswordInput.value = '';
+  if (el.adminModalError) el.adminModalError.hidden = true;
+  if (el.adminModalOverlay) el.adminModalOverlay.classList.remove('hidden');
+  setTimeout(() => el.modalAdminPasswordInput?.focus(), 50);
+}
+
+function closeAdminModal() {
+  if (el.adminModalOverlay) el.adminModalOverlay.classList.add('hidden');
+}
+
+async function selectProfile(id, pin = '', profileName = '') {
   try {
     await api(`/api/profiles/${encodeURIComponent(id)}/select`, {
       method: 'POST',
       body: { pin },
     });
-    window.location.reload();
+    closePinModal();
+    window.location.href = '/';
   } catch (err) {
     if (err.code === 'pin_required' || err.message?.toLowerCase().includes('pin')) {
-      const enteredPin = window.prompt('Profil ini dilindungi PIN. Masukkan 4–6 digit PIN:');
-      if (enteredPin !== null && enteredPin.trim()) {
-        selectProfile(id, enteredPin.trim());
-        return;
+      openPinModal(id, profileName);
+      if (pin && el.pinModalError) {
+        el.pinModalError.textContent = err.message || 'PIN salah, coba lagi';
+        el.pinModalError.hidden = false;
       }
+      return;
     }
     toast(err.message, 'error');
   }
 }
+
+// ── Multi-Step Registration Wizard (/register) ──────────────────────────────
+let currentWizardStep = 1;
+
+function parseTlvClient(input) {
+  const str = String(input || '').trim();
+  if (!str.startsWith('000201')) return null;
+  const tags = {};
+  let i = 0;
+  while (i < str.length) {
+    if (i + 4 > str.length) break;
+    const tag = str.slice(i, i + 2);
+    const len = parseInt(str.slice(i + 2, i + 4), 10);
+    if (isNaN(len)) break;
+    const val = str.slice(i + 4, i + 4 + len);
+    tags[tag] = val;
+    i += 4 + len;
+  }
+  return tags;
+}
+
+function showRegisterWizard() {
+  stopTimers();
+  el.gate.hidden = true;
+  el.app.hidden = true;
+  el.profiles.hidden = true;
+  if (el.registerScreen) el.registerScreen.hidden = false;
+  document.title = 'Daftar Merchant Baru — GoPay Bill';
+  window.scrollTo(0, 0);
+  finishBoot();
+  setWizardStep(1);
+}
+
+function setWizardStep(step) {
+  currentWizardStep = step;
+  document.querySelectorAll('.wizard-step').forEach((s) => {
+    const sNum = parseInt(s.dataset.step, 10);
+    s.classList.toggle('active', sNum === step);
+    s.classList.toggle('completed', sNum < step);
+  });
+  document.querySelectorAll('.wizard-pane').forEach((p) => {
+    const pNum = parseInt(p.dataset.step, 10);
+    p.classList.toggle('active', pNum === step);
+  });
+  if (el.wizError) el.wizError.hidden = true;
+}
+
+function updateQrisInspector() {
+  if (!el.wizQris || !el.wizQrisPreview) return;
+  const raw = el.wizQris.value.trim();
+  const tags = parseTlvClient(raw);
+  if (tags && (tags['59'] || raw.startsWith('000201'))) {
+    if (el.wizQrisMerchantName) el.wizQrisMerchantName.textContent = tags['59'] || 'Merchant Terdeteksi';
+    if (el.wizQrisCity) el.wizQrisCity.textContent = tags['60'] || 'Indonesia';
+    el.wizQrisPreview.classList.remove('hidden');
+  } else {
+    el.wizQrisPreview.classList.add('hidden');
+  }
+}
+
+function navigateTo(path) {
+  window.history.pushState(null, '', path);
+  if (path === '/register') {
+    showRegisterWizard();
+  } else if (path === '/login' || path === '/profiles') {
+    showProfiles();
+  } else if (state.profile) {
+    showApp();
+  } else {
+    showProfiles();
+  }
+}
+
+window.addEventListener('popstate', () => {
+  const path = window.location.pathname;
+  if (path === '/register') {
+    showRegisterWizard();
+  } else if (path === '/login' || path === '/profiles') {
+    showProfiles();
+  } else if (state.profile) {
+    showApp();
+  } else {
+    showProfiles();
+  }
+});
 
 async function leaveProfile() {
   try {
@@ -1497,19 +1662,9 @@ function bindEvents() {
 
   const navAdminLoginBtn = document.getElementById('navAdminLoginBtn');
   if (navAdminLoginBtn) {
-    navAdminLoginBtn.addEventListener('click', async () => {
-      const pwd = window.prompt('Masukkan Password Admin / Pemilik:');
-      if (!pwd) return;
-      try {
-        const res = await api('/api/admin/unlock', {
-          method: 'POST',
-          body: { password: pwd },
-        });
-        toast(res.message || 'Berhasil masuk sebagai Admin!', 'ok');
-        window.location.reload();
-      } catch (err) {
-        toast(err.message, 'error');
-      }
+    navAdminLoginBtn.addEventListener('click', () => {
+      closeNavDrawer();
+      openAdminModal();
     });
   }
 
@@ -2084,10 +2239,213 @@ function bindEvents() {
   el.otpForm.addEventListener('submit', submitOtp);
   if (el.editProfileForm) el.editProfileForm.addEventListener('submit', saveProfile);
 
-  el.createForm.addEventListener('submit', createBill);
-  el.profileForm.addEventListener('submit', createProfile);
-  el.switchProfileBtn.addEventListener('click', leaveProfile);
-  el.deleteProfileBtn.addEventListener('click', deleteProfile);
+  if (el.createForm) el.createForm.addEventListener('submit', createBill);
+  if (el.profileForm) el.profileForm.addEventListener('submit', createProfile);
+  if (el.switchProfileBtn) el.switchProfileBtn.addEventListener('click', leaveProfile);
+  if (el.deleteProfileBtn) el.deleteProfileBtn.addEventListener('click', deleteProfile);
+
+  // ── Multi-Step Wizard Events ──
+  if (el.btnGoToRegister) {
+    el.btnGoToRegister.addEventListener('click', () => navigateTo('/register'));
+  }
+
+  if (el.wizCancelBtn) {
+    el.wizCancelBtn.addEventListener('click', () => navigateTo('/login'));
+  }
+
+  if (el.wizStep1NextBtn) {
+    el.wizStep1NextBtn.addEventListener('click', () => {
+      const name = el.wizName?.value.trim();
+      const phone = el.wizPhone?.value.trim();
+      if (!name) {
+        toast('Nama profil / toko wajib diisi', 'error');
+        el.wizName?.focus();
+        return;
+      }
+      if (!phone || phone.length < 9) {
+        toast('Nomor HP GoPay minimal 9 digit', 'error');
+        el.wizPhone?.focus();
+        return;
+      }
+      setWizardStep(2);
+    });
+  }
+
+  if (el.wizQris) {
+    el.wizQris.addEventListener('input', updateQrisInspector);
+  }
+
+  if (el.wizStep2BackBtn) {
+    el.wizStep2BackBtn.addEventListener('click', () => setWizardStep(1));
+  }
+
+  if (el.wizStep2NextBtn) {
+    el.wizStep2NextBtn.addEventListener('click', () => {
+      const qris = el.wizQris?.value.trim();
+      if (!qris || !qris.startsWith('000201')) {
+        toast('String QRIS harus format EMVCo valid (diawali 000201)', 'error');
+        el.wizQris?.focus();
+        return;
+      }
+      setWizardStep(3);
+    });
+  }
+
+  if (el.wizStep3BackBtn) {
+    el.wizStep3BackBtn.addEventListener('click', () => setWizardStep(2));
+  }
+
+  if (el.wizardForm) {
+    el.wizardForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = el.wizName?.value.trim();
+      const phone = el.wizPhone?.value.trim();
+      const qris = el.wizQris?.value.trim();
+      const pin = el.wizPin?.value.trim() || '';
+      const pinConfirm = el.wizPinConfirm?.value.trim() || '';
+
+      if (pin) {
+        if (!/^\d{4,6}$/.test(pin)) {
+          if (el.wizError) {
+            el.wizError.textContent = 'PIN harus berupa 4–6 digit angka';
+            el.wizError.hidden = false;
+          }
+          el.wizPin?.focus();
+          return;
+        }
+        if (pin !== pinConfirm) {
+          if (el.wizError) {
+            el.wizError.textContent = 'Konfirmasi PIN tidak cocok dengan PIN di atas';
+            el.wizError.hidden = false;
+          }
+          el.wizPinConfirm?.focus();
+          return;
+        }
+      }
+
+      el.wizSubmitBtn.disabled = true;
+      el.wizSubmitBtn.textContent = 'Mendaftarkan toko…';
+      if (el.wizError) el.wizError.hidden = true;
+
+      try {
+        const body = { name, phone, qris };
+        if (pin) body.pin = pin;
+        await api('/api/profiles', {
+          method: 'POST',
+          body,
+        });
+        toast('Profil toko berhasil didaftarkan!', 'ok');
+        window.location.href = '/';
+      } catch (err) {
+        if (el.wizError) {
+          el.wizError.textContent = err.message || 'Gagal mendaftar';
+          el.wizError.hidden = false;
+        }
+        toast(err.message, 'error');
+      } finally {
+        el.wizSubmitBtn.disabled = false;
+        el.wizSubmitBtn.textContent = 'Daftar & Buka Dashboard 🚀';
+      }
+    });
+  }
+
+  // ── PIN Modal Events ──
+  if (el.pinModalCancelBtn) {
+    el.pinModalCancelBtn.addEventListener('click', closePinModal);
+  }
+  if (el.pinModalOverlay) {
+    el.pinModalOverlay.addEventListener('click', (e) => {
+      if (e.target === el.pinModalOverlay) closePinModal();
+    });
+  }
+  if (el.pinModalForm) {
+    el.pinModalForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = el.modalPinInput?.value.trim();
+      if (!pin) return;
+      if (!pendingPinProfileId) return;
+
+      el.pinModalSubmitBtn.disabled = true;
+      el.pinModalSubmitBtn.textContent = 'Memverifikasi…';
+      if (el.pinModalError) el.pinModalError.hidden = true;
+
+      try {
+        await api(`/api/profiles/${encodeURIComponent(pendingPinProfileId)}/select`, {
+          method: 'POST',
+          body: { pin },
+        });
+        closePinModal();
+        window.location.href = '/';
+      } catch (err) {
+        if (el.pinModalError) {
+          el.pinModalError.textContent = err.message || 'PIN salah, coba lagi';
+          el.pinModalError.hidden = false;
+        }
+        el.modalPinInput?.focus();
+        el.modalPinInput?.select();
+      } finally {
+        el.pinModalSubmitBtn.disabled = false;
+        el.pinModalSubmitBtn.textContent = 'Buka Profil';
+      }
+    });
+  }
+
+  // ── Admin Modal Events ──
+  if (el.adminModalCancelBtn) {
+    el.adminModalCancelBtn.addEventListener('click', closeAdminModal);
+  }
+  if (el.adminModalOverlay) {
+    el.adminModalOverlay.addEventListener('click', (e) => {
+      if (e.target === el.adminModalOverlay) closeAdminModal();
+    });
+  }
+  if (el.adminModalForm) {
+    el.adminModalForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = el.modalAdminPasswordInput?.value;
+      if (!password) return;
+
+      el.adminModalSubmitBtn.disabled = true;
+      el.adminModalSubmitBtn.textContent = 'Memverifikasi…';
+      if (el.adminModalError) el.adminModalError.hidden = true;
+
+      try {
+        const res = await api('/api/admin/unlock', {
+          method: 'POST',
+          body: { password },
+        });
+        closeAdminModal();
+        toast(res.message || 'Berhasil masuk sebagai Admin!', 'ok');
+        window.location.reload();
+      } catch (err) {
+        if (el.adminModalError) {
+          el.adminModalError.textContent = err.message || 'Password salah';
+          el.adminModalError.hidden = false;
+        }
+        el.modalAdminPasswordInput?.focus();
+        el.modalAdminPasswordInput?.select();
+      } finally {
+        el.adminModalSubmitBtn.disabled = false;
+        el.adminModalSubmitBtn.textContent = 'Masuk Admin';
+      }
+    });
+  }
+
+  // ── Eye Toggle for Password/PIN Inputs ──
+  document.querySelectorAll('.btn-toggle-eye').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.target;
+      const input = document.getElementById(targetId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    });
+  });
 
   for (const chip of document.querySelectorAll('[data-amount]')) {
     chip.addEventListener('click', () => {

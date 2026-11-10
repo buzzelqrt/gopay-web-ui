@@ -108,35 +108,117 @@
         <p class="hint">Memuat profil…</p>
       </div>
 
-      <details id="profileCreate" class="profile-create">
-        <summary>Daftar / Buat Profil Merchant Baru</summary>
-        <form id="profileForm" class="profile-form">
+      <div class="profiles-action-box" style="margin-top: 16px;">
+        <button id="btnGoToRegister" class="btn primary block" type="button">
+          ➕ Daftar Merchant / Toko Baru
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Register / Multi-Step Onboarding Wizard Screen (/register) -->
+  <section id="registerScreen" class="register-screen" aria-labelledby="regWizardTitle" hidden>
+    <div class="register-card">
+      <div class="card-head">
+        <div class="register-brand">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#d97757" stroke-width="2">
+            <path d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z" />
+            <circle cx="12" cy="12" r="2.8" fill="#d97757" stroke="none" />
+          </svg>
+        </div>
+        <h1 id="regWizardTitle" class="title-serif">Pendaftaran Merchant</h1>
+        <p class="text-sub">Buat profil tokomu untuk generate QRIS dinamis &amp; terima mutasi otomatis.</p>
+      </div>
+
+      <!-- Multi-step Stepper -->
+      <div class="wizard-stepper">
+        <div class="wizard-step active" data-step="1">
+          <div class="step-num">1</div>
+          <span class="step-label">Toko</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="wizard-step" data-step="2">
+          <div class="step-num">2</div>
+          <span class="step-label">QRIS</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="wizard-step" data-step="3">
+          <div class="step-num">3</div>
+          <span class="step-label">PIN</span>
+        </div>
+      </div>
+
+      <form id="wizardForm" class="wizard-form" novalidate>
+        <!-- Step 1: Info Toko & No HP -->
+        <div class="wizard-pane active" data-step="1">
           <div class="form-group">
-            <label for="profileName">Nama profil / toko</label>
-            <input id="profileName" name="name" type="text" maxlength="40" placeholder="Contoh: Toko Kopi Utama" required />
+            <label for="wizName">Nama Profil / Toko <span class="required">*</span></label>
+            <input id="wizName" name="name" type="text" maxlength="40" placeholder="Contoh: Kedai Kopi Utama" required />
+            <p class="hint">Nama usaha atau toko yang akan tampil di dashboard.</p>
           </div>
 
           <div class="form-group">
-            <label for="profilePhone">Nomor HP GoPay</label>
-            <input id="profilePhone" name="phone" type="tel" inputmode="tel" maxlength="18" placeholder="081234567890" required />
+            <label for="wizPhone">Nomor HP GoPay Merchant <span class="required">*</span></label>
+            <input id="wizPhone" name="phone" type="tel" inputmode="tel" maxlength="18" placeholder="Contoh: 081234567890" required />
+            <p class="hint">Nomor yang terdaftar di akun GoBiz / GoPay untuk terima mutasi.</p>
+          </div>
+
+          <div class="wizard-nav-row">
+            <button id="wizCancelBtn" type="button" class="btn ghost">Kembali ke Profil</button>
+            <button id="wizStep1NextBtn" type="button" class="btn primary">Lanjut: Setup QRIS ➔</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Setup QRIS EMVCo -->
+        <div class="wizard-pane" data-step="2">
+          <div class="form-group">
+            <label for="wizQris">String QRIS Statis Toko <span class="required">*</span></label>
+            <textarea id="wizQris" name="qris" rows="3" spellcheck="false" placeholder="000201010211...6304ABCD" required></textarea>
+            <p class="hint">Salin string QRIS statis dari aplikasi GoBiz atau hasil scan QR toko kamu.</p>
+          </div>
+
+          <!-- Realtime QRIS Inspector Box -->
+          <div id="wizQrisPreview" class="qris-inspector-box hidden">
+            <div class="inspector-badge">QRIS EMVCo Terdeteksi ✓</div>
+            <div class="inspector-detail">
+              <div><span class="muted">Nama Toko:</span> <strong id="wizQrisMerchantName">—</strong></div>
+              <div><span class="muted">Kota:</span> <span id="wizQrisCity">—</span></div>
+            </div>
+          </div>
+
+          <div class="wizard-nav-row">
+            <button id="wizStep2BackBtn" type="button" class="btn ghost">⬅ Kembali</button>
+            <button id="wizStep2NextBtn" type="button" class="btn primary">Lanjut: Atur PIN ➔</button>
+          </div>
+        </div>
+
+        <!-- Step 3: PIN Keamanan -->
+        <div class="wizard-pane" data-step="3">
+          <div class="form-group">
+            <label for="wizPin">Buat PIN Keamanan <span class="muted">(4–6 Digit Angka, opsional)</span></label>
+            <div class="input-with-eye">
+              <input id="wizPin" name="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="Contoh: 123456" />
+              <button type="button" class="btn-toggle-eye" data-target="wizPin" aria-label="Lihat PIN">👁️</button>
+            </div>
+            <p class="hint">Kunci tokomu agar orang lain tidak bisa sembarangan membuka profil ini.</p>
           </div>
 
           <div class="form-group">
-            <label for="profileQris">Payload QRIS statis merchant</label>
-            <textarea id="profileQris" name="qris" rows="3" spellcheck="false" placeholder="000201010211...6304ABCD" required></textarea>
-            <p class="hint">Tempel string QRIS statis EMVCo merchant kamu.</p>
+            <label for="wizPinConfirm">Ulangi PIN Keamanan</label>
+            <div class="input-with-eye">
+              <input id="wizPinConfirm" name="pin_confirm" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="Masukkan ulang PIN di atas" />
+              <button type="button" class="btn-toggle-eye" data-target="wizPinConfirm" aria-label="Lihat PIN">👁️</button>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="profilePin">PIN Keamanan Profil <span class="muted">(4–6 digit angka, opsional)</span></label>
-            <input id="profilePin" name="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="Contoh: 123456" />
-            <p class="hint">Kunci profilmu agar orang lain tidak bisa sembarangan membuka akunmu.</p>
-          </div>
+          <p id="wizError" class="error-msg" role="alert" hidden></p>
 
-          <p id="profileError" class="error-msg" role="alert" hidden></p>
-          <button id="profileBtn" class="btn primary block" type="submit">Daftar & Masuk ke Profil</button>
-        </form>
-      </details>
+          <div class="wizard-nav-row">
+            <button id="wizStep3BackBtn" type="button" class="btn ghost">⬅ Kembali</button>
+            <button id="wizSubmitBtn" type="submit" class="btn primary">Daftar &amp; Buka Dashboard 🚀</button>
+          </div>
+        </div>
+      </form>
     </div>
   </section>
 
@@ -1349,6 +1431,60 @@
       <p>GoPay Bill · Dashboard Tagihan QRIS</p>
       <p class="footer-sub">Modul: <a href="https://github.com/kavionn/gobiz-payment" target="_blank" rel="noreferrer">kavionn/gobiz-payment</a> · Pemakaian pribadi.</p>
     </footer>
+  </div>
+
+  <!-- Modal Input PIN Profil -->
+  <div id="pinModalOverlay" class="custom-modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="custom-modal-card">
+      <div class="custom-modal-head">
+        <div class="modal-icon-badge">🔒</div>
+        <h2 id="pinModalTitle" class="title-serif">Kunci Keamanan PIN</h2>
+        <p id="pinModalSub" class="text-sub">Profil <strong id="pinModalProfileName">Toko</strong> dilindungi PIN. Masukkan PIN untuk melanjutkan.</p>
+      </div>
+
+      <form id="pinModalForm" class="custom-modal-form">
+        <div class="form-group">
+          <div class="input-with-eye">
+            <input id="modalPinInput" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="4–6 Digit PIN" autocomplete="off" required />
+            <button type="button" class="btn-toggle-eye" data-target="modalPinInput" aria-label="Lihat PIN">👁️</button>
+          </div>
+        </div>
+
+        <p id="pinModalError" class="error-msg" role="alert" hidden></p>
+
+        <div class="custom-modal-actions">
+          <button id="pinModalCancelBtn" type="button" class="btn ghost">Batal</button>
+          <button id="pinModalSubmitBtn" type="submit" class="btn primary">Buka Profil</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Password Admin / Pemilik -->
+  <div id="adminModalOverlay" class="custom-modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="custom-modal-card">
+      <div class="custom-modal-head">
+        <div class="modal-icon-badge">👑</div>
+        <h2 class="title-serif">Akses Pemilik / Admin</h2>
+        <p class="text-sub">Masukkan password admin untuk membuka akses penuh sistem.</p>
+      </div>
+
+      <form id="adminModalForm" class="custom-modal-form">
+        <div class="form-group">
+          <div class="input-with-eye">
+            <input id="modalAdminPasswordInput" type="password" placeholder="Password Admin" autocomplete="current-password" required />
+            <button type="button" class="btn-toggle-eye" data-target="modalAdminPasswordInput" aria-label="Lihat Password">👁️</button>
+          </div>
+        </div>
+
+        <p id="adminModalError" class="error-msg" role="alert" hidden></p>
+
+        <div class="custom-modal-actions">
+          <button id="adminModalCancelBtn" type="button" class="btn ghost">Batal</button>
+          <button id="adminModalSubmitBtn" type="submit" class="btn primary">Masuk Admin</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
