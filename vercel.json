@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://buzzel.dpdns.org/api/$1"
+      "destination": "https://apis.buzzel.dpdns.org/api/$1"
     },
     {
       "source": "/join/(.*)",
-      "destination": "https://buzzel.dpdns.org/join/$1"
+      "destination": "https://apis.buzzel.dpdns.org/join/$1"
     }
   ]
 }

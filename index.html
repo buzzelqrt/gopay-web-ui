@@ -743,7 +743,7 @@
               <div class="zass-box-group">
                 <div class="zass-box-label">BASE URL</div>
                 <div class="zass-box">
-                  <span id="docsBaseUrlDisplay" class="zass-box-value mono">https://buzzel.dpdns.org/api</span>
+                  <span id="docsBaseUrlDisplay" class="zass-box-value mono">https://apis.buzzel.dpdns.org/api</span>
                   <button id="copyBaseUrlBtn" class="zass-icon-copy-btn" type="button" title="Salin Base URL">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -841,7 +841,7 @@
               <!-- Endpoint Route Header -->
               <div class="zass-route-header">
                 <span class="zass-method-pill post">POST</span>
-                <span class="zass-url-pill mono">https://buzzel.dpdns.org/api/bills</span>
+                <span class="zass-url-pill mono">https://apis.buzzel.dpdns.org/api/bills</span>
               </div>
               <p class="zass-endpoint-summary">
                 Membuat tagihan baru dengan nominal tertentu dan menghasilkan kode QRIS dinamis (string QR dan SVG) siap dipajang ke pembeli.
@@ -965,7 +965,7 @@
             <section class="zass-card zass-endpoint-section">
               <div class="zass-route-header">
                 <span class="zass-method-pill get">GET</span>
-                <span class="zass-url-pill mono">https://buzzel.dpdns.org/api/bills/:ref</span>
+                <span class="zass-url-pill mono">https://apis.buzzel.dpdns.org/api/bills/:ref</span>
               </div>
               <p class="zass-endpoint-summary">
                 Mengecek status pembayaran tagihan. Nilai status otomatis berganti dari <code class="code-inline">pending</code> menjadi <code class="code-inline">paid</code> begitu transaksi mutasi terdeteksi masuk.
@@ -1058,7 +1058,7 @@
             <section class="zass-card zass-endpoint-section">
               <div class="zass-route-header">
                 <span class="zass-method-pill get">GET</span>
-                <span class="zass-url-pill mono">https://buzzel.dpdns.org/api/bills</span>
+                <span class="zass-url-pill mono">https://apis.buzzel.dpdns.org/api/bills</span>
               </div>
               <p class="zass-endpoint-summary">
                 Mengambil riwayat seluruh tagihan pada akun/profil merchant aktif dengan filter status dan batasan jumlah.
@@ -1160,7 +1160,7 @@
             <section class="zass-card zass-endpoint-section">
               <div class="zass-route-header">
                 <span class="zass-method-pill post">POST</span>
-                <span class="zass-url-pill mono">https://buzzel.dpdns.org/api/bills/:ref/cancel</span>
+                <span class="zass-url-pill mono">https://apis.buzzel.dpdns.org/api/bills/:ref/cancel</span>
               </div>
               <p class="zass-endpoint-summary">
                 Membatalkan tagihan yang berstatus <code class="code-inline">pending</code> sehingga tagihan ditutup dan mutasi tidak lagi dicocokkan ke tagihan ini.
