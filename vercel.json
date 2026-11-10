@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://buzzel.dpdns.org/api/$1"
+    },
+    {
+      "source": "/join/(.*)",
+      "destination": "https://buzzel.dpdns.org/join/$1"
+    }
+  ]
+}

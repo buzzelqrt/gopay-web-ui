@@ -1,0 +1,6 @@
+{
+  "name": "gopay-bill-frontend",
+  "version": "1.0.0",
+  "description": "Frontend UI for GoPay Bill (Vercel Deployment)",
+  "private": true
+}
