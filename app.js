@@ -54,6 +54,11 @@ const state = {
 };
 
 const el = {
+  home: document.getElementById('home'),
+  homeLoginBtn: document.getElementById('homeLoginBtn'),
+  homeRegisterBtn: document.getElementById('homeRegisterBtn'),
+  homeRegisterCta: document.getElementById('homeRegisterCta'),
+  homeRegisterCtaBottom: document.getElementById('homeRegisterCtaBottom'),
   gate: document.getElementById('gate'),
   gateError: document.getElementById('gateError'),
   gateTitle: document.getElementById('gateTitle'),
@@ -286,14 +291,32 @@ function finishBoot() {
   if (el.boot) el.boot.hidden = true;
 }
 
-function showGate(message) {
+function showHome() {
   stopTimers();
+  if (el.app) el.app.hidden = true;
+  if (el.profiles) el.profiles.hidden = true;
+  if (el.registerScreen) el.registerScreen.hidden = true;
+  if (el.gate) el.gate.hidden = true;
+  if (el.home) el.home.hidden = false;
+  document.title = 'GoPay Bill — Dashboard Tagihan QRIS';
+  window.scrollTo(0, 0);
+}
+
+function goToAuth(view) {
+  const path = view === 'login' ? '/login' : '/register';
+  window.history.pushState(null, '', path);
+  showGate('', view);
+}
+
+function showGate(message, view) {
+  stopTimers();
+  if (el.home) el.home.hidden = true;
   if (el.app) el.app.hidden = true;
   if (el.profiles) el.profiles.hidden = true;
   if (el.registerScreen) el.registerScreen.hidden = true;
   if (el.gate) el.gate.hidden = false;
   document.title = 'Masuk — GoPay Bill';
-  showGateView(message ? 'login' : 'register');
+  showGateView(view || (message || window.location.pathname === '/login' ? 'login' : 'register'));
   if (message && el.gateError) {
     el.gateError.textContent = message;
     el.gateError.hidden = false;
@@ -331,6 +354,11 @@ function showGateError(message) {
 }
 
 function bindAuthEvents() {
+  if (el.homeLoginBtn) el.homeLoginBtn.addEventListener('click', () => goToAuth('login'));
+  if (el.homeRegisterBtn) el.homeRegisterBtn.addEventListener('click', () => goToAuth('register'));
+  if (el.homeRegisterCta) el.homeRegisterCta.addEventListener('click', () => goToAuth('register'));
+  if (el.homeRegisterCtaBottom)
+    el.homeRegisterCtaBottom.addEventListener('click', () => goToAuth('register'));
   if (el.showLoginBtn) el.showLoginBtn.addEventListener('click', () => showGateView('login'));
   if (el.showRegisterBtn) el.showRegisterBtn.addEventListener('click', () => showGateView('register'));
   if (el.registerForm) el.registerForm.addEventListener('submit', submitRegister);
@@ -447,7 +475,12 @@ async function boot() {
     state.session = session;
 
     if (!session.authenticated) {
-      showGate('');
+      const path = window.location.pathname;
+      if (path === '/login' || path === '/register') {
+        showGate('', path === '/login' ? 'login' : 'register');
+      } else {
+        showHome();
+      }
       return;
     }
 
@@ -476,6 +509,7 @@ async function boot() {
 
 async function showProfiles(message) {
   stopTimers();
+  if (el.home) el.home.hidden = true;
   el.gate.hidden = true;
   el.app.hidden = true;
   if (el.registerScreen) el.registerScreen.hidden = true;
@@ -640,6 +674,7 @@ function parseTlvClient(input) {
 
 function showRegisterWizard() {
   stopTimers();
+  if (el.home) el.home.hidden = true;
   el.gate.hidden = true;
   el.app.hidden = true;
   el.profiles.hidden = true;
@@ -692,6 +727,14 @@ function navigateTo(path) {
 
 window.addEventListener('popstate', () => {
   const path = window.location.pathname;
+  if (!state.session?.authenticated) {
+    if (path === '/login' || path === '/register') {
+      showGate('', path === '/login' ? 'login' : 'register');
+    } else {
+      showHome();
+    }
+    return;
+  }
   if (path === '/register') {
     showRegisterWizard();
   } else if (path === '/login' || path === '/profiles') {
@@ -805,6 +848,7 @@ async function saveProfile(evt) {
 }
 
 async function startApp() {
+  if (el.home) el.home.hidden = true;
   el.gate.hidden = true;
   el.profiles.hidden = true;
   el.app.hidden = false;
