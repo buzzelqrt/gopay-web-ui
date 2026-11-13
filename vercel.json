@@ -11,6 +11,10 @@
       "destination": "https://apis.buzzel.dpdns.org/join/$1"
     },
     {
+      "source": "/home",
+      "destination": "/"
+    },
+    {
       "source": "/register",
       "destination": "/"
     },

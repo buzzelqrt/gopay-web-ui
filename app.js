@@ -59,6 +59,7 @@ const el = {
   homeRegisterBtn: document.getElementById('homeRegisterBtn'),
   homeRegisterCta: document.getElementById('homeRegisterCta'),
   homeRegisterCtaBottom: document.getElementById('homeRegisterCtaBottom'),
+  homeDashboardBtn: document.getElementById('homeDashboardBtn'),
   gate: document.getElementById('gate'),
   gateError: document.getElementById('gateError'),
   gateTitle: document.getElementById('gateTitle'),
@@ -298,8 +299,36 @@ function showHome() {
   if (el.registerScreen) el.registerScreen.hidden = true;
   if (el.gate) el.gate.hidden = true;
   if (el.home) el.home.hidden = false;
+  syncHomeAuthUi();
   document.title = 'GoPay Bill — Dashboard Tagihan QRIS';
   window.scrollTo(0, 0);
+}
+
+function syncHomeAuthUi() {
+  const authed = Boolean(state.session?.authenticated);
+  if (el.homeLoginBtn) el.homeLoginBtn.hidden = authed;
+  if (el.homeRegisterBtn) el.homeRegisterBtn.hidden = authed;
+  if (el.homeDashboardBtn) el.homeDashboardBtn.hidden = !authed;
+  if (el.homeRegisterCta) {
+    el.homeRegisterCta.textContent = authed ? 'Buka dashboard' : 'Buat akun gratis';
+  }
+  if (el.homeRegisterCtaBottom) {
+    el.homeRegisterCtaBottom.textContent = authed ? 'Buka dashboard' : 'Daftar sekarang';
+  }
+}
+
+function goHome() {
+  if (window.location.pathname !== '/home') window.history.pushState(null, '', '/home');
+  showHome();
+}
+
+function goDashboard() {
+  window.history.pushState(null, '', '/dashboard');
+  if (state.profile) {
+    startApp();
+  } else {
+    showProfiles();
+  }
 }
 
 function goToAuth(view) {
@@ -354,11 +383,12 @@ function showGateError(message) {
 }
 
 function bindAuthEvents() {
+  const openRegister = () => (state.session?.authenticated ? goDashboard() : goToAuth('register'));
   if (el.homeLoginBtn) el.homeLoginBtn.addEventListener('click', () => goToAuth('login'));
-  if (el.homeRegisterBtn) el.homeRegisterBtn.addEventListener('click', () => goToAuth('register'));
-  if (el.homeRegisterCta) el.homeRegisterCta.addEventListener('click', () => goToAuth('register'));
-  if (el.homeRegisterCtaBottom)
-    el.homeRegisterCtaBottom.addEventListener('click', () => goToAuth('register'));
+  if (el.homeRegisterBtn) el.homeRegisterBtn.addEventListener('click', openRegister);
+  if (el.homeRegisterCta) el.homeRegisterCta.addEventListener('click', openRegister);
+  if (el.homeRegisterCtaBottom) el.homeRegisterCtaBottom.addEventListener('click', openRegister);
+  if (el.homeDashboardBtn) el.homeDashboardBtn.addEventListener('click', goDashboard);
   if (el.showLoginBtn) el.showLoginBtn.addEventListener('click', () => showGateView('login'));
   if (el.showRegisterBtn) el.showRegisterBtn.addEventListener('click', () => showGateView('register'));
   if (el.registerForm) el.registerForm.addEventListener('submit', submitRegister);
@@ -473,6 +503,11 @@ async function boot() {
     state.mode = session.auth_mode || 'google';
     state.isAdmin = Boolean(session.is_admin);
     state.session = session;
+
+    if (session.authenticated && window.location.pathname === '/home') {
+      showHome();
+      return;
+    }
 
     if (!session.authenticated) {
       const path = window.location.pathname;
@@ -719,7 +754,7 @@ function navigateTo(path) {
   } else if (path === '/login' || path === '/profiles') {
     showProfiles();
   } else if (state.profile) {
-    showApp();
+    startApp();
   } else {
     showProfiles();
   }
@@ -735,12 +770,16 @@ window.addEventListener('popstate', () => {
     }
     return;
   }
+  if (path === '/home') {
+    showHome();
+    return;
+  }
   if (path === '/register') {
     showRegisterWizard();
   } else if (path === '/login' || path === '/profiles') {
     showProfiles();
   } else if (state.profile) {
-    showApp();
+    startApp();
   } else {
     showProfiles();
   }
@@ -1676,6 +1715,14 @@ function bindEvents() {
 
   if (navCloseBtn) navCloseBtn.addEventListener('click', closeNavDrawer);
   if (navBackdrop) navBackdrop.addEventListener('click', closeNavDrawer);
+
+  const navHomeBtn = document.getElementById('navHomeBtn');
+  if (navHomeBtn) {
+    navHomeBtn.addEventListener('click', () => {
+      closeNavDrawer();
+      goHome();
+    });
+  }
 
   const navItems = document.querySelectorAll('.nav-item[data-nav]');
   navItems.forEach((btn) => {
