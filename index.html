@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app.css?v=45" />
+  <link rel="stylesheet" href="/app.css?v=46" />
 </head>
 <body class="is-booting">
   <!-- Boot Screen -->
@@ -175,7 +175,7 @@
           <input id="regPassword" name="password" type="password" minlength="8" placeholder="Minimal 8 karakter" autocomplete="new-password" required />
         </div>
         <button id="registerBtn" class="btn primary block" type="submit">Daftar</button>
-        <p class="hint">Sudah punya akun? <button id="showLoginBtn" class="link-btn" type="button">Masuk</button></p>
+        <p class="hint">Sudah punya akun? <button id="showLoginBtn" class="link-btn" type="button">Masuk</button> · <button id="showForgotBtn2" class="link-btn" type="button">Lupa password?</button></p>
       </form>
 
       <form id="loginForm" class="gate-form" hidden>
@@ -188,7 +188,31 @@
           <input id="loginPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" required />
         </div>
         <button id="loginBtn" class="btn primary block" type="submit">Masuk</button>
-        <p class="hint">Belum punya akun? <button id="showRegisterBtn" class="link-btn" type="button">Daftar</button></p>
+        <p class="hint">Belum punya akun? <button id="showRegisterBtn" class="link-btn" type="button">Daftar</button> · <button id="showForgotBtn" class="link-btn" type="button">Lupa password?</button></p>
+      </form>
+
+      <form id="forgotForm" class="gate-form" hidden>
+        <p class="hint">Masukkan email akunmu. Kami kirim kode 6 digit untuk membuat password baru.</p>
+        <div class="form-group">
+          <label for="forgotEmail">Email</label>
+          <input id="forgotEmail" name="email" type="email" placeholder="nama@email.com" autocomplete="email" required />
+        </div>
+        <button id="forgotBtn" class="btn primary block" type="submit">Kirim kode reset</button>
+        <p class="hint">Sudah ingat password? <button id="forgotBackBtn" class="link-btn" type="button">Kembali ke Masuk</button></p>
+      </form>
+
+      <form id="resetForm" class="gate-form" hidden>
+        <p class="hint">Kode dikirim ke <strong id="resetEmailLabel">email kamu</strong>. Berlaku 10 menit.</p>
+        <div class="form-group">
+          <label for="resetCode">Kode reset</label>
+          <input id="resetCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required />
+        </div>
+        <div class="form-group">
+          <label for="resetPassword">Password baru</label>
+          <input id="resetPassword" name="password" type="password" minlength="8" placeholder="Minimal 8 karakter" autocomplete="new-password" required />
+        </div>
+        <button id="resetBtn" class="btn primary block" type="submit">Simpan password baru</button>
+        <p class="hint">Belum dapat kode? <button id="resetResendBtn" class="link-btn" type="button">Kirim ulang</button></p>
       </form>
 
       <form id="verifyForm" class="gate-form" hidden>
@@ -1354,6 +1378,7 @@
         </div>
 
         <p id="acctError" class="error-msg" role="alert" hidden></p>
+        <button id="claimPhoneBtn" class="btn ghost block claim-phone-btn" type="button" hidden>Pindahkan nomor ke akun ini</button>
 
         <div class="account-actions">
           <button id="connectBtn" class="btn primary" type="button">Hubungkan akun</button>
@@ -1445,6 +1470,6 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=45" defer></script>
+  <script src="/app.js?v=46" defer></script>
 </body>
 </html>

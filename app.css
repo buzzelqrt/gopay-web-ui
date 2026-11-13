@@ -3235,3 +3235,8 @@ code {
     padding: 18px 16px 24px;
   }
 }
+
+/* Tombol pindah kepemilikan nomor GoPay (muncul saat nomor sudah dipakai akun lain). */
+.claim-phone-btn {
+  margin-bottom: 12px;
+}

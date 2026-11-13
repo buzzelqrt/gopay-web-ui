@@ -19,6 +19,9 @@ const SECURITY_LABELS = {
   admin_ip_trusted: 'IP disetujui sebagai admin',
   profile_ip_trusted: 'IP disetujui untuk profil',
   api_key_regenerated: 'API Key digenerate ulang',
+  gopay_account_transfer: 'Nomor GoPay dipindahkan ke akun lain',
+  password_reset_request: 'Permintaan reset password',
+  password_reset: 'Password direset',
 };
 
 const ACCOUNT_LABELS = {
@@ -51,6 +54,7 @@ const state = {
   docsLang: 'curl',
   gateView: 'register',
   pendingEmail: null,
+  resetEmail: null,
 };
 
 const el = {
@@ -73,6 +77,19 @@ const el = {
   loginEmail: document.getElementById('loginEmail'),
   loginPassword: document.getElementById('loginPassword'),
   loginBtn: document.getElementById('loginBtn'),
+  forgotForm: document.getElementById('forgotForm'),
+  forgotEmail: document.getElementById('forgotEmail'),
+  forgotBtn: document.getElementById('forgotBtn'),
+  resetForm: document.getElementById('resetForm'),
+  resetCode: document.getElementById('resetCode'),
+  resetPassword: document.getElementById('resetPassword'),
+  resetBtn: document.getElementById('resetBtn'),
+  resetEmailLabel: document.getElementById('resetEmailLabel'),
+  resetResendBtn: document.getElementById('resetResendBtn'),
+  showForgotBtn: document.getElementById('showForgotBtn'),
+  showForgotBtn2: document.getElementById('showForgotBtn2'),
+  forgotBackBtn: document.getElementById('forgotBackBtn'),
+  claimPhoneBtn: document.getElementById('claimPhoneBtn'),
   verifyForm: document.getElementById('verifyForm'),
   verifyCode: document.getElementById('verifyCode'),
   verifyBtn: document.getElementById('verifyBtn'),
@@ -353,27 +370,37 @@ function showGate(message, view) {
   window.scrollTo(0, 0);
 }
 
+const GATE_TITLES = {
+  login: 'Masuk',
+  register: 'Daftar Akun',
+  verify: 'Verifikasi Email',
+  forgot: 'Lupa Password',
+  reset: 'Buat Password Baru',
+};
+
+const GATE_SUBS = {
+  login: 'Masuk pakai email dan password akun kamu.',
+  register: 'Daftar pakai email. Setelah klik Daftar, kode verifikasi dikirim ke email itu.',
+  verify: 'Masukkan 6 digit kode yang dikirim ke email kamu.',
+  forgot: 'Masukkan email akunmu. Kami kirim kode 6 digit untuk membuat password baru.',
+  reset: 'Masukkan kode reset dan password baru kamu.',
+};
+
 function showGateView(view) {
   state.gateView = view;
   if (el.registerForm) el.registerForm.hidden = view !== 'register';
   if (el.loginForm) el.loginForm.hidden = view !== 'login';
   if (el.verifyForm) el.verifyForm.hidden = view !== 'verify';
+  if (el.forgotForm) el.forgotForm.hidden = view !== 'forgot';
+  if (el.resetForm) el.resetForm.hidden = view !== 'reset';
 
-  if (el.gateTitle) {
-    el.gateTitle.textContent =
-      view === 'login' ? 'Masuk' : view === 'verify' ? 'Verifikasi Email' : 'Daftar Akun';
-  }
-  if (el.gateSub) {
-    el.gateSub.textContent =
-      view === 'login'
-        ? 'Masuk pakai email dan password akun kamu.'
-        : view === 'verify'
-          ? 'Masukkan 6 digit kode yang dikirim ke email kamu.'
-          : 'Daftar pakai email. Setelah klik Daftar, kode verifikasi dikirim ke email itu.';
-  }
+  if (el.gateTitle) el.gateTitle.textContent = GATE_TITLES[view] || GATE_TITLES.register;
+  if (el.gateSub) el.gateSub.textContent = GATE_SUBS[view] || GATE_SUBS.register;
   if (el.gateError) el.gateError.hidden = true;
   if (el.verifyEmailLabel) el.verifyEmailLabel.textContent = state.pendingEmail || 'email kamu';
+  if (el.resetEmailLabel) el.resetEmailLabel.textContent = state.resetEmail || 'email kamu';
   if (view === 'verify' && el.verifyCode) window.setTimeout(() => el.verifyCode.focus(), 50);
+  if (view === 'reset' && el.resetCode) window.setTimeout(() => el.resetCode.focus(), 50);
 }
 
 function showGateError(message) {
@@ -395,6 +422,17 @@ function bindAuthEvents() {
   if (el.loginForm) el.loginForm.addEventListener('submit', submitLogin);
   if (el.verifyForm) el.verifyForm.addEventListener('submit', submitVerify);
   if (el.resendCodeBtn) el.resendCodeBtn.addEventListener('click', resendCode);
+  const openForgot = () => {
+    const email = el.loginEmail?.value.trim() || el.regEmail?.value.trim() || '';
+    if (email && el.forgotEmail) el.forgotEmail.value = email;
+    showGateView('forgot');
+  };
+  if (el.showForgotBtn) el.showForgotBtn.addEventListener('click', openForgot);
+  if (el.showForgotBtn2) el.showForgotBtn2.addEventListener('click', openForgot);
+  if (el.forgotBackBtn) el.forgotBackBtn.addEventListener('click', () => showGateView('login'));
+  if (el.forgotForm) el.forgotForm.addEventListener('submit', submitForgot);
+  if (el.resetForm) el.resetForm.addEventListener('submit', submitReset);
+  if (el.resetResendBtn) el.resetResendBtn.addEventListener('click', resendReset);
 }
 
 async function submitRegister(event) {
@@ -426,6 +464,10 @@ async function submitRegister(event) {
     );
   } catch (err) {
     showGateError(err.message);
+    if (err.code === 'email_registered') {
+      state.resetEmail = el.regEmail.value.trim();
+      if (el.forgotEmail) el.forgotEmail.value = state.resetEmail;
+    }
   } finally {
     el.registerBtn.disabled = false;
     el.registerBtn.textContent = label;
@@ -490,6 +532,88 @@ async function resendCode() {
       body: { email: state.pendingEmail },
     });
     toast(data.email_sent ? 'Kode baru sudah dikirim.' : 'Kode baru dicatat di log server.', 'ok');
+  } catch (err) {
+    showGateError(err.message);
+  }
+}
+
+async function submitForgot(event) {
+  event.preventDefault();
+  showGateError('');
+  el.forgotBtn.disabled = true;
+  const label = el.forgotBtn.textContent;
+  el.forgotBtn.textContent = 'Mengirim…';
+
+  try {
+    const email = el.forgotEmail.value.trim();
+    const data = await api('/api/password/forgot', { method: 'POST', body: { email } });
+
+    state.resetEmail = data.email || email;
+    if (el.resetEmailLabel) el.resetEmailLabel.textContent = state.resetEmail;
+    if (el.resetCode) el.resetCode.value = '';
+    if (el.resetPassword) el.resetPassword.value = '';
+    showGateView('reset');
+    toast(
+      data.email_sent
+        ? 'Kode reset dikirim ke email kamu.'
+        : 'Email belum dikonfigurasi; kode reset dicatat di log server.',
+      data.email_sent ? 'ok' : 'error'
+    );
+  } catch (err) {
+    showGateError(err.message);
+  } finally {
+    el.forgotBtn.disabled = false;
+    el.forgotBtn.textContent = label;
+  }
+}
+
+async function submitReset(event) {
+  event.preventDefault();
+  showGateError('');
+  el.resetBtn.disabled = true;
+  const label = el.resetBtn.textContent;
+  el.resetBtn.textContent = 'Menyimpan…';
+
+  try {
+    await api('/api/password/reset', {
+      method: 'POST',
+      body: {
+        email: state.resetEmail,
+        code: el.resetCode.value.trim(),
+        password: el.resetPassword.value,
+      },
+    });
+
+    toast('Password diperbarui. Masuk dengan password baru.', 'ok');
+    if (el.loginEmail) el.loginEmail.value = state.resetEmail || '';
+    if (el.loginPassword) el.loginPassword.value = '';
+    if (el.resetPassword) el.resetPassword.value = '';
+    showGateView('login');
+  } catch (err) {
+    showGateError(err.message);
+    if (el.resetCode) el.resetCode.focus();
+  } finally {
+    el.resetBtn.disabled = false;
+    el.resetBtn.textContent = label;
+  }
+}
+
+async function resendReset() {
+  showGateError('');
+  if (!state.resetEmail) {
+    showGateView('forgot');
+    return;
+  }
+
+  try {
+    const data = await api('/api/password/forgot', {
+      method: 'POST',
+      body: { email: state.resetEmail },
+    });
+    toast(
+      data.email_sent ? 'Kode reset baru sudah dikirim.' : 'Kode reset baru dicatat di log server.',
+      'ok'
+    );
   } catch (err) {
     showGateError(err.message);
   }
@@ -1028,14 +1152,41 @@ async function connectAccount() {
 
   try {
     const data = await api('/api/account/connect', { method: 'POST' });
+    if (el.claimPhoneBtn) el.claimPhoneBtn.hidden = true;
     if (state.account) state.account = { ...state.account, ...data.account };
     renderAccount();
     startAccountWatch();
     toast('Menyiapkan sesi akun GoPay…');
   } catch (err) {
     toast(err.message, 'error');
+    if (err.code === 'gopay_phone_taken' && el.claimPhoneBtn) {
+      el.claimPhoneBtn.hidden = false;
+    }
     el.connectBtn.disabled = false;
     el.connectBtn.textContent = 'Hubungkan akun';
+  }
+}
+
+async function claimPhoneAccount() {
+  const ok = window.confirm(
+    'Pindahkan nomor GoPay ini ke akunmu? Koneksi di akun lama akan diputuskan, lalu kamu perlu memasukkan OTP yang dikirim ke nomor tersebut.'
+  );
+  if (!ok) return;
+
+  el.claimPhoneBtn.disabled = true;
+  el.acctError.hidden = true;
+
+  try {
+    const data = await api('/api/account/claim', { method: 'POST' });
+    el.claimPhoneBtn.hidden = true;
+    if (state.account) state.account = { ...state.account, ...data.account };
+    renderAccount();
+    startAccountWatch();
+    toast('Nomor dipindahkan. Masukkan OTP untuk menyelesaikan koneksi.');
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    el.claimPhoneBtn.disabled = false;
   }
 }
 
@@ -1980,6 +2131,7 @@ function bindEvents() {
 
   el.connectBtn.addEventListener('click', connectAccount);
   el.disconnectBtn.addEventListener('click', disconnectAccount);
+  if (el.claimPhoneBtn) el.claimPhoneBtn.addEventListener('click', claimPhoneAccount);
   el.otpForm.addEventListener('submit', submitOtp);
   if (el.editProfileForm) el.editProfileForm.addEventListener('submit', saveProfile);
 
