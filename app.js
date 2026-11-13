@@ -30,8 +30,8 @@ const ACCOUNT_LABELS = {
 };
 
 const state = {
-  mode: 'password',
-  isAdmin: true,
+  mode: 'google',
+  isAdmin: false,
   session: null,
   profile: null,
   account: null,
@@ -49,16 +49,31 @@ const state = {
   toastTimer: null,
   apiKey: null,
   docsLang: 'curl',
+  gateView: 'register',
+  pendingEmail: null,
 };
 
 const el = {
   gate: document.getElementById('gate'),
-  loginForm: document.getElementById('loginForm'),
-  loginBtn: document.getElementById('loginBtn'),
-  password: document.getElementById('password'),
-  totpField: document.getElementById('totpField'),
-  totpCode: document.getElementById('totpCode'),
   gateError: document.getElementById('gateError'),
+  gateTitle: document.getElementById('gateTitle'),
+  gateSub: document.getElementById('gateSub'),
+  registerForm: document.getElementById('registerForm'),
+  regName: document.getElementById('regName'),
+  regEmail: document.getElementById('regEmail'),
+  regPassword: document.getElementById('regPassword'),
+  registerBtn: document.getElementById('registerBtn'),
+  loginForm: document.getElementById('loginForm'),
+  loginEmail: document.getElementById('loginEmail'),
+  loginPassword: document.getElementById('loginPassword'),
+  loginBtn: document.getElementById('loginBtn'),
+  verifyForm: document.getElementById('verifyForm'),
+  verifyCode: document.getElementById('verifyCode'),
+  verifyBtn: document.getElementById('verifyBtn'),
+  verifyEmailLabel: document.getElementById('verifyEmailLabel'),
+  resendCodeBtn: document.getElementById('resendCodeBtn'),
+  showLoginBtn: document.getElementById('showLoginBtn'),
+  showRegisterBtn: document.getElementById('showRegisterBtn'),
   app: document.getElementById('app'),
   boot: document.getElementById('boot'),
   profiles: document.getElementById('profiles'),
@@ -82,7 +97,6 @@ const el = {
   editProfilePin: document.getElementById('editProfilePin'),
   saveProfileBtn: document.getElementById('saveProfileBtn'),
   editProfileError: document.getElementById('editProfileError'),
-  gateIp: document.getElementById('visitorIpDisplay') || document.getElementById('gateIp'),
   acctQris: document.getElementById('acctQris'),
   accountChip: document.getElementById('accountChip'),
   accountChipText: document.getElementById('accountChipText'),
@@ -128,12 +142,6 @@ const el = {
   pinModalCancelBtn: document.getElementById('pinModalCancelBtn'),
   pinModalSubmitBtn: document.getElementById('pinModalSubmitBtn'),
   pinModalProfileName: document.getElementById('pinModalProfileName'),
-  adminModalOverlay: document.getElementById('adminModalOverlay'),
-  modalAdminPasswordInput: document.getElementById('modalAdminPasswordInput'),
-  adminModalForm: document.getElementById('adminModalForm'),
-  adminModalError: document.getElementById('adminModalError'),
-  adminModalCancelBtn: document.getElementById('adminModalCancelBtn'),
-  adminModalSubmitBtn: document.getElementById('adminModalSubmitBtn'),
   statPending: document.getElementById('statPending'),
   statTotal: document.getElementById('statTotal'),
   statPaid: document.getElementById('statPaid'),
@@ -257,7 +265,7 @@ async function api(path, options = {}) {
     if (response.status === 401 && !path.startsWith('/api/session')) {
       if (data.code === 'profile_required') {
         showProfiles('Pilih profil dulu untuk melanjutkan.');
-      } else if (state.mode !== 'ip') {
+      } else {
         showGate('Sesi berakhir. Masuk lagi untuk melanjutkan.');
       }
     }
@@ -278,84 +286,155 @@ function finishBoot() {
   if (el.boot) el.boot.hidden = true;
 }
 
-let accessPollTimer = null;
-
-async function checkAccessStatus() {
-  try {
-    const res = await api('/api/access-request');
-    const visitorIpDisplay = document.getElementById('visitorIpDisplay');
-    const waShareBtn = document.getElementById('waShareBtn');
-    if (visitorIpDisplay && res.client_ip) {
-      visitorIpDisplay.textContent = res.client_ip;
-    }
-    if (waShareBtn && res.client_ip) {
-      waShareBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-        `Halo admin, tolong setujui IP saya untuk akses GoPay Bill: ${res.client_ip}`
-      )}`;
-    }
-
-    if (res.is_approved) {
-      const wasPolling = Boolean(accessPollTimer);
-      if (accessPollTimer) {
-        clearInterval(accessPollTimer);
-        accessPollTimer = null;
-      }
-      if (wasPolling) {
-        toast('Akses IP kamu telah disetujui!', 'ok');
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 800);
-        return;
-      }
-      // Bukan dari polling (misal user memang admin atau sudah approved)
-      if (el.gate) el.gate.hidden = true;
-      if (!state.session || !state.session.profile) {
-        await showProfiles();
-      } else {
-        await startApp();
-      }
-      return;
-    }
-
-    const requestPendingBox = document.getElementById('requestPendingBox');
-    const requestAccessForm = document.getElementById('requestAccessForm');
-    const pendingNameText = document.getElementById('pendingNameText');
-
-    if (res.request && res.request.status === 'pending') {
-      if (requestPendingBox) requestPendingBox.classList.remove('hidden');
-      if (requestAccessForm) requestAccessForm.classList.add('hidden');
-      if (pendingNameText) pendingNameText.textContent = res.request.name || 'kamu';
-
-      if (!accessPollTimer) {
-        accessPollTimer = setInterval(checkAccessStatus, 3000);
-      }
-    } else {
-      if (requestPendingBox) requestPendingBox.classList.add('hidden');
-      if (requestAccessForm) requestAccessForm.classList.remove('hidden');
-      if (accessPollTimer) {
-        clearInterval(accessPollTimer);
-        accessPollTimer = null;
-      }
-    }
-  } catch {}
-}
-
 function showGate(message) {
   stopTimers();
-  if (accessPollTimer) {
-    clearInterval(accessPollTimer);
-    accessPollTimer = null;
-  }
   if (el.app) el.app.hidden = true;
   if (el.profiles) el.profiles.hidden = true;
+  if (el.registerScreen) el.registerScreen.hidden = true;
   if (el.gate) el.gate.hidden = false;
-  document.title = 'Akses Terbatas — GoPay Bill';
+  document.title = 'Masuk — GoPay Bill';
+  showGateView(message ? 'login' : 'register');
   if (message && el.gateError) {
     el.gateError.textContent = message;
     el.gateError.hidden = false;
   }
   window.scrollTo(0, 0);
-  checkAccessStatus();
+}
+
+function showGateView(view) {
+  state.gateView = view;
+  if (el.registerForm) el.registerForm.hidden = view !== 'register';
+  if (el.loginForm) el.loginForm.hidden = view !== 'login';
+  if (el.verifyForm) el.verifyForm.hidden = view !== 'verify';
+
+  if (el.gateTitle) {
+    el.gateTitle.textContent =
+      view === 'login' ? 'Masuk' : view === 'verify' ? 'Verifikasi Email' : 'Daftar Akun';
+  }
+  if (el.gateSub) {
+    el.gateSub.textContent =
+      view === 'login'
+        ? 'Masuk pakai email dan password akun kamu.'
+        : view === 'verify'
+          ? 'Masukkan 6 digit kode yang dikirim ke email kamu.'
+          : 'Daftar pakai email. Setelah klik Daftar, kode verifikasi dikirim ke email itu.';
+  }
+  if (el.gateError) el.gateError.hidden = true;
+  if (el.verifyEmailLabel) el.verifyEmailLabel.textContent = state.pendingEmail || 'email kamu';
+  if (view === 'verify' && el.verifyCode) window.setTimeout(() => el.verifyCode.focus(), 50);
+}
+
+function showGateError(message) {
+  if (!el.gateError) return;
+  el.gateError.textContent = message || '';
+  el.gateError.hidden = !message;
+}
+
+function bindAuthEvents() {
+  if (el.showLoginBtn) el.showLoginBtn.addEventListener('click', () => showGateView('login'));
+  if (el.showRegisterBtn) el.showRegisterBtn.addEventListener('click', () => showGateView('register'));
+  if (el.registerForm) el.registerForm.addEventListener('submit', submitRegister);
+  if (el.loginForm) el.loginForm.addEventListener('submit', submitLogin);
+  if (el.verifyForm) el.verifyForm.addEventListener('submit', submitVerify);
+  if (el.resendCodeBtn) el.resendCodeBtn.addEventListener('click', resendCode);
+}
+
+async function submitRegister(event) {
+  event.preventDefault();
+  showGateError('');
+  el.registerBtn.disabled = true;
+  const label = el.registerBtn.textContent;
+  el.registerBtn.textContent = 'Mengirim kode…';
+
+  try {
+    const data = await api('/api/register', {
+      method: 'POST',
+      body: {
+        name: el.regName.value.trim(),
+        email: el.regEmail.value.trim(),
+        password: el.regPassword.value,
+      },
+    });
+
+    state.pendingEmail = data.email || el.regEmail.value.trim();
+    if (el.verifyEmailLabel) el.verifyEmailLabel.textContent = state.pendingEmail;
+    if (el.verifyCode) el.verifyCode.value = '';
+    showGateView('verify');
+    toast(
+      data.email_sent
+        ? 'Kode verifikasi dikirim ke email kamu.'
+        : 'Email belum dikonfigurasi; kode dicatat di log server.',
+      data.email_sent ? 'ok' : 'error'
+    );
+  } catch (err) {
+    showGateError(err.message);
+  } finally {
+    el.registerBtn.disabled = false;
+    el.registerBtn.textContent = label;
+  }
+}
+
+async function submitLogin(event) {
+  event.preventDefault();
+  showGateError('');
+  el.loginBtn.disabled = true;
+  const label = el.loginBtn.textContent;
+  el.loginBtn.textContent = 'Memeriksa…';
+
+  try {
+    await api('/api/session', {
+      method: 'POST',
+      body: { email: el.loginEmail.value.trim(), password: el.loginPassword.value },
+    });
+    window.location.reload();
+  } catch (err) {
+    showGateError(err.message);
+    el.loginPassword.select();
+  } finally {
+    el.loginBtn.disabled = false;
+    el.loginBtn.textContent = label;
+  }
+}
+
+async function submitVerify(event) {
+  event.preventDefault();
+  showGateError('');
+  el.verifyBtn.disabled = true;
+  const label = el.verifyBtn.textContent;
+  el.verifyBtn.textContent = 'Memverifikasi…';
+
+  try {
+    await api('/api/register/verify', {
+      method: 'POST',
+      body: { email: state.pendingEmail, code: el.verifyCode.value.trim() },
+    });
+    window.location.reload();
+  } catch (err) {
+    showGateError(err.message);
+    el.verifyCode.value = '';
+    el.verifyCode.focus();
+  } finally {
+    el.verifyBtn.disabled = false;
+    el.verifyBtn.textContent = label;
+  }
+}
+
+async function resendCode() {
+  showGateError('');
+  if (!state.pendingEmail) {
+    showGateView('register');
+    return;
+  }
+
+  try {
+    const data = await api('/api/register/resend', {
+      method: 'POST',
+      body: { email: state.pendingEmail },
+    });
+    toast(data.email_sent ? 'Kode baru sudah dikirim.' : 'Kode baru dicatat di log server.', 'ok');
+  } catch (err) {
+    showGateError(err.message);
+  }
 }
 
 async function boot() {
@@ -363,26 +442,12 @@ async function boot() {
 
   try {
     const session = await api('/api/session');
-    state.mode = session.auth_mode || 'password';
+    state.mode = session.auth_mode || 'google';
     state.isAdmin = Boolean(session.is_admin);
     state.session = session;
 
-    const navAdminIpBtn = document.getElementById('navAdminIpBtn');
-    const navAdminLoginBtn = document.getElementById('navAdminLoginBtn');
-    if (navAdminIpBtn) navAdminIpBtn.classList.toggle('hidden', !state.isAdmin);
-    if (navAdminLoginBtn) navAdminLoginBtn.classList.toggle('hidden', state.isAdmin);
-
-    if (el.totpField) el.totpField.classList.toggle('hidden', !session.totp_required);
-    if (el.gateIp) el.gateIp.textContent = session.client_ip ? `IP kamu: ${session.client_ip}` : '';
-
-    if (session.auth_mode === 'password' && !session.authenticated) {
-      if (!session.password_configured) {
-        if (el.loginBtn) el.loginBtn.disabled = true;
-        if (el.password) el.password.disabled = true;
-        showGate('APP_PASSWORD belum diisi di .env. Isi dulu, lalu restart server.');
-      } else {
-        showGate('');
-      }
+    if (!session.authenticated) {
+      showGate('');
       return;
     }
 
@@ -530,17 +595,6 @@ function openPinModal(profileId, profileName = '') {
 function closePinModal() {
   pendingPinProfileId = null;
   if (el.pinModalOverlay) el.pinModalOverlay.classList.add('hidden');
-}
-
-function openAdminModal() {
-  if (el.modalAdminPasswordInput) el.modalAdminPasswordInput.value = '';
-  if (el.adminModalError) el.adminModalError.hidden = true;
-  if (el.adminModalOverlay) el.adminModalOverlay.classList.remove('hidden');
-  setTimeout(() => el.modalAdminPasswordInput?.focus(), 50);
-}
-
-function closeAdminModal() {
-  if (el.adminModalOverlay) el.adminModalOverlay.classList.add('hidden');
 }
 
 async function selectProfile(id, pin = '', profileName = '') {
@@ -754,56 +808,17 @@ async function startApp() {
   el.gate.hidden = true;
   el.profiles.hidden = true;
   el.app.hidden = false;
-  el.logoutBtn.hidden = state.mode === 'ip';
+  el.logoutBtn.hidden = false;
   if (state.profile) el.profileChipText.textContent = state.profile.name;
 
-  const adminBadge = document.getElementById('adminBadgeBtn');
-  if (adminBadge) adminBadge.classList.toggle('hidden', !state.isAdmin);
-  const navAdminBtn = document.getElementById('navAdminIpBtn');
-  if (navAdminBtn) navAdminBtn.classList.toggle('hidden', !state.isAdmin);
-  const navHelpAdminBtn = document.getElementById('navHelpAdminIpBtn');
-  if (navHelpAdminBtn) navHelpAdminBtn.classList.toggle('hidden', !state.isAdmin);
-
   el.gateError.hidden = true;
-  el.password.value = '';
   document.title = 'Dashboard — GoPay Bill';
   window.scrollTo(0, 0);
-  el.totpCode.value = '';
 
   await loadOverview(true);
   await loadBills(true);
   await loadSecurity(true);
   startOverviewTimer();
-}
-
-async function login(event) {
-  event.preventDefault();
-  el.gateError.hidden = true;
-  el.loginBtn.disabled = true;
-  el.loginBtn.textContent = 'Memeriksa…';
-
-  try {
-    await api('/api/session', {
-      method: 'POST',
-      body: JSON.stringify({
-        password: el.password.value,
-        totp: el.totpCode.value.trim(),
-      }),
-    });
-    window.location.reload();
-  } catch (err) {
-    el.gateError.textContent = err.message;
-    el.gateError.hidden = false;
-    if (el.totpCode.value.trim()) {
-      el.totpCode.value = '';
-      el.totpCode.focus();
-    } else {
-      el.password.select();
-    }
-  } finally {
-    el.loginBtn.disabled = false;
-    el.loginBtn.textContent = 'Masuk';
-  }
 }
 
 async function logout() {
@@ -1587,12 +1602,8 @@ print("Status:", data["bill"]["status"])`;
 }
 
 function bindEvents() {
-  el.loginForm.addEventListener('submit', login);
+  bindAuthEvents();
   el.logoutBtn.addEventListener('click', logout);
-
-  el.password.addEventListener('input', () => {
-    el.gateError.hidden = true;
-  });
 
   // Left Navigation Drawer (Ref: s24jMCg9KC.png)
   const navDrawer = document.getElementById('navDrawer');
@@ -1660,14 +1671,6 @@ function bindEvents() {
     topProfileBtn.addEventListener('click', () => leaveProfile());
   }
 
-  const navAdminLoginBtn = document.getElementById('navAdminLoginBtn');
-  if (navAdminLoginBtn) {
-    navAdminLoginBtn.addEventListener('click', () => {
-      closeNavDrawer();
-      openAdminModal();
-    });
-  }
-
   // Right Account Drawer
   const closeAccountDrawer = () => {
     el.accountPanel.classList.add('hidden');
@@ -1706,354 +1709,6 @@ function bindEvents() {
     el.accountBackdrop.addEventListener('click', closeAccountDrawer);
   }
 
-  // Admin IP Management Modal
-  const adminIpModal = document.getElementById('adminIpModal');
-  const adminModalBackdrop = document.getElementById('adminModalBackdrop');
-  const adminModalCloseBtn = document.getElementById('adminModalCloseBtn');
-  const adminBadgeBtn = document.getElementById('adminBadgeBtn');
-  const navAdminIpBtn = document.getElementById('navAdminIpBtn');
-  const trustIpForm = document.getElementById('trustIpForm');
-  const trustIpType = document.getElementById('trustIpType');
-  const trustProfileSelectGroup = document.getElementById('trustProfileSelectGroup');
-
-  const closeAdminIpModal = () => {
-    if (adminIpModal) adminIpModal.classList.add('hidden');
-    if (adminModalBackdrop) adminModalBackdrop.classList.add('hidden');
-  };
-
-  const openAdminIpModal = async (prefillIp = '') => {
-    closeNavDrawer();
-    closeAccountDrawer();
-
-    if (adminIpModal) adminIpModal.classList.remove('hidden');
-    if (adminModalBackdrop) adminModalBackdrop.classList.remove('hidden');
-
-    const inputIp = document.getElementById('trustIpInput');
-    if (prefillIp && inputIp) {
-      inputIp.value = prefillIp;
-      inputIp.focus();
-    }
-
-    try {
-      const data = await api('/api/admin/ips');
-      const clientIpEl = document.getElementById('adminClientIp');
-      if (clientIpEl) clientIpEl.textContent = data.client_ip || '—';
-
-      const profileSelect = document.getElementById('trustProfileSelect');
-      const inviteProfileSelect = document.getElementById('inviteProfileSelect');
-      if (data.profiles) {
-        if (profileSelect) profileSelect.replaceChildren();
-        if (inviteProfileSelect) inviteProfileSelect.replaceChildren();
-
-        data.profiles.forEach((p) => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = `${p.name}${p.ips?.length ? ` (${p.ips.join(', ')})` : ''}`;
-          if (state.profile && state.profile.id === p.id) opt.selected = true;
-          if (profileSelect) profileSelect.append(opt);
-
-          const optInvite = opt.cloneNode(true);
-          if (inviteProfileSelect) inviteProfileSelect.append(optInvite);
-        });
-      }
-
-      // Muat Permintaan Akses Masuk (Pending Requests)
-      try {
-        const reqData = await api('/api/admin/access-requests');
-        const badge = document.getElementById('accessRequestsBadge');
-        if (badge) badge.textContent = `${reqData.pending_count || 0} Baru`;
-
-        const reqList = document.getElementById('accessRequestsList');
-        if (reqList) {
-          reqList.replaceChildren();
-          const pending = (reqData.requests || []).filter((r) => r.status === 'pending');
-
-          if (!pending.length) {
-            reqList.append(createHint('Tidak ada permintaan pending saat ini.'));
-          } else {
-            pending.forEach((r) => {
-              const card = document.createElement('div');
-              card.className = 'access-req-card';
-
-              const head = document.createElement('div');
-              head.className = 'req-head';
-
-              const userDiv = document.createElement('div');
-              userDiv.className = 'req-user';
-
-              const nameSpan = document.createElement('span');
-              nameSpan.className = 'req-name';
-              nameSpan.textContent = r.name;
-
-              const metaSpan = document.createElement('span');
-              metaSpan.className = 'req-meta mono';
-              metaSpan.textContent = `${r.ip} · ${formatDate(r.created_at)}`;
-
-              userDiv.append(nameSpan, metaSpan);
-              head.append(userDiv);
-
-              const actions = document.createElement('div');
-              actions.className = 'req-actions';
-
-              const sel = document.createElement('select');
-              if (data.profiles) {
-                data.profiles.forEach((p) => {
-                  const opt = document.createElement('option');
-                  opt.value = p.id;
-                  opt.textContent = `Profil: ${p.name}`;
-                  if (state.profile && state.profile.id === p.id) opt.selected = true;
-                  sel.append(opt);
-                });
-              }
-              const adminOpt = document.createElement('option');
-              adminOpt.value = '__admin__';
-              adminOpt.textContent = 'Jadikan Akses Admin';
-              sel.append(adminOpt);
-
-              const approveBtn = document.createElement('button');
-              approveBtn.type = 'button';
-              approveBtn.className = 'btn-approve-req';
-              approveBtn.textContent = 'Setujui Akses';
-              approveBtn.addEventListener('click', async () => {
-                approveBtn.disabled = true;
-                approveBtn.textContent = 'Memproses…';
-                try {
-                  const targetType = sel.value === '__admin__' ? 'admin' : 'profile';
-                  const profile_id = sel.value === '__admin__' ? null : sel.value;
-                  const res = await api(`/api/admin/access-requests/${r.id}/approve`, {
-                    method: 'POST',
-                    body: { profile_id, type: targetType },
-                  });
-                  toast(res.message, 'ok');
-                  openAdminIpModal();
-                  loadSecurity(true);
-                } catch (err) {
-                  toast(err.message, 'error');
-                  approveBtn.disabled = false;
-                  approveBtn.textContent = 'Setujui Akses';
-                }
-              });
-
-              const rejectBtn = document.createElement('button');
-              rejectBtn.type = 'button';
-              rejectBtn.className = 'btn-reject-req';
-              rejectBtn.textContent = 'Tolak';
-              rejectBtn.addEventListener('click', async () => {
-                if (!confirm(`Tolak permintaan akses dari ${r.name}?`)) return;
-                try {
-                  const res = await api(`/api/admin/access-requests/${r.id}/reject`, {
-                    method: 'POST',
-                  });
-                  toast(res.message, 'ok');
-                  openAdminIpModal();
-                } catch (err) {
-                  toast(err.message, 'error');
-                }
-              });
-
-              actions.append(sel, approveBtn, rejectBtn);
-              card.append(head, actions);
-              reqList.append(card);
-            });
-          }
-        }
-      } catch {}
-
-      const adminIpsList = document.getElementById('adminIpsList');
-      if (adminIpsList) {
-        adminIpsList.replaceChildren();
-        if (!data.allowed_admin_ips?.length) {
-          adminIpsList.append(createHint('Belum ada IP admin terdaftar.'));
-        } else {
-          data.allowed_admin_ips.forEach((ip) => {
-            const row = document.createElement('div');
-            row.className = 'admin-ip-row';
-            const span = document.createElement('span');
-            span.className = 'mono';
-            span.textContent = ip + (ip === data.client_ip ? ' (kamu)' : '');
-            row.append(span);
-
-            if (data.allowed_admin_ips.length > 1) {
-              const delBtn = document.createElement('button');
-              delBtn.type = 'button';
-              delBtn.className = 'btn-remove-ip';
-              delBtn.textContent = 'Hapus';
-              delBtn.addEventListener('click', async () => {
-                if (!confirm(`Hapus IP admin ${ip}?`)) return;
-                try {
-                  await api('/api/admin/trust-ip', {
-                    method: 'DELETE',
-                    body: { ip, type: 'admin' },
-                  });
-                  toast(`IP admin ${ip} dihapus.`, 'ok');
-                  openAdminIpModal();
-                } catch (err) {
-                  toast(err.message, 'error');
-                }
-              });
-              row.append(delBtn);
-            }
-            adminIpsList.append(row);
-          });
-        }
-      }
-
-      const blockedIpsList = document.getElementById('blockedIpsList');
-      if (blockedIpsList) {
-        blockedIpsList.replaceChildren();
-        if (!data.blocked_ips?.length) {
-          blockedIpsList.append(createHint('Belum ada log IP yang ditolak.'));
-        } else {
-          data.blocked_ips.forEach((ip) => {
-            const row = document.createElement('div');
-            row.className = 'blocked-ip-row';
-            const span = document.createElement('span');
-            span.className = 'mono';
-            span.textContent = ip;
-            const trustBtn = document.createElement('button');
-            trustBtn.type = 'button';
-            trustBtn.className = 'btn-trust-ip';
-            trustBtn.textContent = 'Setujui IP';
-            trustBtn.addEventListener('click', () => {
-              if (inputIp) {
-                inputIp.value = ip;
-                inputIp.scrollIntoView({ behavior: 'smooth' });
-                inputIp.focus();
-              }
-            });
-            row.append(span, trustBtn);
-            blockedIpsList.append(row);
-          });
-        }
-      }
-    } catch (err) {
-      toast(err.message, 'error');
-    }
-  };
-
-  window.openAdminIpModal = openAdminIpModal;
-
-  const navHelpAdminIpBtn = document.getElementById('navHelpAdminIpBtn');
-
-  if (adminBadgeBtn) adminBadgeBtn.addEventListener('click', () => openAdminIpModal());
-  if (navAdminIpBtn) navAdminIpBtn.addEventListener('click', () => openAdminIpModal());
-  if (navHelpAdminIpBtn) navHelpAdminIpBtn.addEventListener('click', () => openAdminIpModal());
-  if (adminModalCloseBtn) adminModalCloseBtn.addEventListener('click', closeAdminIpModal);
-  if (adminModalBackdrop) adminModalBackdrop.addEventListener('click', closeAdminIpModal);
-
-  if (trustIpType && trustProfileSelectGroup) {
-    trustIpType.addEventListener('change', () => {
-      trustProfileSelectGroup.classList.toggle('hidden', trustIpType.value === 'admin');
-    });
-  }
-
-  if (trustIpForm) {
-    trustIpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const ip = document.getElementById('trustIpInput')?.value?.trim();
-      const type = trustIpType?.value;
-      const profile_id = document.getElementById('trustProfileSelect')?.value;
-
-      try {
-        const res = await api('/api/admin/trust-ip', {
-          method: 'POST',
-          body: { ip, type, profile_id },
-        });
-        toast(res.message || `IP ${ip} berhasil disetujui.`, 'ok');
-        trustIpForm.reset();
-        openAdminIpModal();
-        loadSecurity(true);
-      } catch (err) {
-        toast(err.message, 'error');
-      }
-    });
-  }
-
-  // Buat Magic Link Undangan
-  const createInviteForm = document.getElementById('createInviteForm');
-  if (createInviteForm) {
-    createInviteForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const profile_id = document.getElementById('inviteProfileSelect')?.value;
-      const label = document.getElementById('inviteLabel')?.value?.trim();
-      const btn = createInviteForm.querySelector('button[type="submit"]');
-      if (btn) btn.disabled = true;
-
-      try {
-        const res = await api('/api/admin/invites', {
-          method: 'POST',
-          body: { profile_id, label, hours: 24, max_uses: 1 },
-        });
-
-        const resultBox = document.getElementById('inviteResultBox');
-        const urlInput = document.getElementById('inviteUrlInput');
-        if (resultBox && urlInput) {
-          urlInput.value = res.invite_url;
-          resultBox.classList.remove('hidden');
-        }
-        toast('Link undangan berhasil dibuat!', 'ok');
-        createInviteForm.reset();
-      } catch (err) {
-        toast(err.message, 'error');
-      } finally {
-        if (btn) btn.disabled = false;
-      }
-    });
-  }
-
-  const copyInviteBtn = document.getElementById('copyInviteUrlBtn');
-  if (copyInviteBtn) {
-    copyInviteBtn.addEventListener('click', () => {
-      const urlInput = document.getElementById('inviteUrlInput');
-      if (urlInput?.value) {
-        navigator.clipboard.writeText(urlInput.value);
-        toast('Link undangan disalin ke clipboard!', 'ok');
-      }
-    });
-  }
-
-  // Salin IP pengunjung pada layar Gate
-  const copyVisitorIpBtn = document.getElementById('copyVisitorIpBtn');
-  if (copyVisitorIpBtn) {
-    copyVisitorIpBtn.addEventListener('click', () => {
-      const ipText = document.getElementById('visitorIpDisplay')?.textContent;
-      if (ipText && ipText !== '—') {
-        navigator.clipboard.writeText(ipText);
-        toast(`IP ${ipText} disalin!`, 'ok');
-      }
-    });
-  }
-
-  // Pengunjung mengirim permintaan izin akses
-  const requestAccessForm = document.getElementById('requestAccessForm');
-  if (requestAccessForm) {
-    requestAccessForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('requesterName')?.value?.trim();
-      const btn = document.getElementById('submitRequestBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Mengirim…';
-      }
-
-      try {
-        const res = await api('/api/access-request', {
-          method: 'POST',
-          body: { name },
-        });
-        toast(res.message, 'ok');
-        checkAccessStatus();
-      } catch (err) {
-        toast(err.message, 'error');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = 'Kirim Permintaan Akses';
-        }
-      }
-    });
-  }
-
   if (el.billFilterPills) {
     const pillButtons = el.billFilterPills.querySelectorAll('.tab-btn, .pill-btn');
     pillButtons.forEach((btn) => {
@@ -2090,8 +1745,6 @@ function bindEvents() {
   const openDocsModal = async () => {
     closeNavDrawer();
     closeAccountDrawer();
-    if (adminIpModal) adminIpModal.classList.add('hidden');
-    if (adminModalBackdrop) adminModalBackdrop.classList.add('hidden');
 
     if (el.docsModal) el.docsModal.classList.remove('hidden');
     if (el.docsBackdrop) el.docsBackdrop.classList.remove('hidden');
@@ -2386,47 +2039,6 @@ function bindEvents() {
       } finally {
         el.pinModalSubmitBtn.disabled = false;
         el.pinModalSubmitBtn.textContent = 'Buka Profil';
-      }
-    });
-  }
-
-  // ── Admin Modal Events ──
-  if (el.adminModalCancelBtn) {
-    el.adminModalCancelBtn.addEventListener('click', closeAdminModal);
-  }
-  if (el.adminModalOverlay) {
-    el.adminModalOverlay.addEventListener('click', (e) => {
-      if (e.target === el.adminModalOverlay) closeAdminModal();
-    });
-  }
-  if (el.adminModalForm) {
-    el.adminModalForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const password = el.modalAdminPasswordInput?.value;
-      if (!password) return;
-
-      el.adminModalSubmitBtn.disabled = true;
-      el.adminModalSubmitBtn.textContent = 'Memverifikasi…';
-      if (el.adminModalError) el.adminModalError.hidden = true;
-
-      try {
-        const res = await api('/api/admin/unlock', {
-          method: 'POST',
-          body: { password },
-        });
-        closeAdminModal();
-        toast(res.message || 'Berhasil masuk sebagai Admin!', 'ok');
-        window.location.reload();
-      } catch (err) {
-        if (el.adminModalError) {
-          el.adminModalError.textContent = err.message || 'Password salah';
-          el.adminModalError.hidden = false;
-        }
-        el.modalAdminPasswordInput?.focus();
-        el.modalAdminPasswordInput?.select();
-      } finally {
-        el.adminModalSubmitBtn.disabled = false;
-        el.adminModalSubmitBtn.textContent = 'Masuk Admin';
       }
     });
   }

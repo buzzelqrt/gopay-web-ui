@@ -2819,3 +2819,22 @@ code {
   gap: 10px;
   margin-top: 20px;
 }
+
+/* Tombol login Google di gate */
+.gate-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #d97757;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
