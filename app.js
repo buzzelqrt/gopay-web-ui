@@ -113,6 +113,7 @@ const el = {
   profileError: document.getElementById('profileError'),
   profileCreate: document.getElementById('profileCreate'),
   profileChipText: document.getElementById('profileChipText'),
+  sidebarProfileName: document.getElementById('sidebarProfileName'),
   switchProfileBtn: document.getElementById('switchProfileBtn'),
   deleteProfileBtn: document.getElementById('deleteProfileBtn'),
   editProfileSection: document.getElementById('editProfileSection'),
@@ -993,7 +994,7 @@ async function saveProfile(evt) {
     });
 
     state.profile = res.profile;
-    if (el.profileChipText) el.profileChipText.textContent = res.profile.name;
+    if (res.profile) setProfileName(res.profile.name);
     toast('Pengaturan profil & QRIS berhasil disimpan', 'ok');
     if (el.editProfileSection) el.editProfileSection.open = false;
     loadState(false);
@@ -1018,7 +1019,7 @@ async function startApp() {
   el.profiles.hidden = true;
   el.app.hidden = false;
   el.logoutBtn.hidden = false;
-  if (state.profile) el.profileChipText.textContent = state.profile.name;
+  if (state.profile) setProfileName(state.profile.name);
   setActiveMobileTab('top');
 
   el.gateError.hidden = true;
@@ -1061,7 +1062,7 @@ async function loadOverview(silent = false) {
 
     if (data.profile) {
       state.profile = data.profile;
-      el.profileChipText.textContent = data.profile.name;
+      setProfileName(data.profile.name);
     }
 
     renderAccount();
@@ -1838,6 +1839,11 @@ print("Status:", data["bill"]["status"])`;
   }
 }
 
+function setProfileName(name) {
+  if (el.profileChipText) el.profileChipText.textContent = name;
+  if (el.sidebarProfileName) el.sidebarProfileName.textContent = name;
+}
+
 function setActiveMobileTab(key) {
   document.querySelectorAll('[data-mobile-nav]').forEach((item) => {
     const isActive = item.dataset.mobileNav === key;
@@ -1885,7 +1891,7 @@ function bindEvents() {
     if (!topbar) return;
     topbar.classList.toggle('is-expanded', value);
   };
-  const isMobileViewport = () => window.matchMedia('(max-width: 840px)').matches;
+  const isMobileViewport = () => window.matchMedia('(max-width: 1023px)').matches;
   const updateTopbarScroll = () => {
     if (!topbar) return;
     if (isMobileViewport()) {

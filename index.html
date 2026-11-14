@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app.css?v=50" />
+  <link rel="stylesheet" href="/app.css?v=53" />
 </head>
 <body class="is-booting">
   <!-- Boot Screen -->
@@ -427,8 +427,8 @@
       <div class="section-top">
         <h2 id="ringkasanTitle" class="section-kicker">Ringkasan</h2>
       </div>
-      <div class="metrics-grid">
-        <div class="metric-card">
+      <div class="summary-strip">
+        <div class="summary-item">
           <div class="metric-head">
             <svg class="metric-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d97757" stroke-width="2">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -438,7 +438,7 @@
           <strong id="statPending" class="metric-num">0</strong>
         </div>
 
-        <div class="metric-card">
+        <div class="summary-item">
           <div class="metric-head">
             <svg class="metric-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d97757" stroke-width="2">
               <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -449,7 +449,7 @@
           <strong id="statAmount" class="metric-num">Rp 0</strong>
         </div>
 
-        <div class="metric-card">
+        <div class="summary-item">
           <div class="metric-head">
             <svg class="metric-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d97757" stroke-width="2">
               <polyline points="20 6 9 17 4 12" />
@@ -459,7 +459,7 @@
           <strong id="statPaid" class="metric-num">0</strong>
         </div>
 
-        <div class="metric-card">
+        <div class="summary-item">
           <div class="metric-head">
             <svg class="metric-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d97757" stroke-width="2">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -474,19 +474,26 @@
 
     <!-- Cashier Workspace -->
     <main class="workspace">
-      <!-- Active Bill Card -->
-      <section id="detailPanel" class="card cashier-card" aria-labelledby="detailTitle">
-        <div class="card-head-row">
+      <section class="card cashier-panel" aria-labelledby="cashierTitle">
+        <div class="cashier-panel-head">
           <div>
-            <h2 id="detailTitle" class="card-title">
-              <span class="text-white">Tagihan</span>
-              <span class="text-muted">Aktif</span>
+            <h2 id="cashierTitle" class="card-title">
+              <span class="text-white">Kasir</span>
+              <span class="text-muted">tagihan</span>
             </h2>
+            <p class="text-sub">Buat tagihan, lalu pantau statusnya di panel yang sama.</p>
           </div>
           <span id="billStatus" class="pill idle" aria-live="polite">Belum ada</span>
         </div>
 
-        <div class="cashier-layout">
+        <div class="cashier-panel-body">
+          <div id="detailPanel" class="cashier-pane" aria-labelledby="detailTitle">
+            <div class="pane-head">
+              <h3 id="detailTitle" class="pane-title">Tagihan aktif</h3>
+              <p class="pane-sub">QRIS dinamis untuk pembeli.</p>
+            </div>
+
+            <div class="cashier-layout">
           <div class="qr-box-wrap">
             <div id="qrBox" class="qr-box">
               <div class="qr-empty">
@@ -541,20 +548,15 @@
             <p id="billHint" class="hint"></p>
           </div>
         </div>
-      </section>
-
-      <!-- Create Bill Card -->
-      <section id="createPanel" class="card create-card" aria-labelledby="createTitle">
-        <div class="card-head-row">
-          <div>
-            <h2 id="createTitle" class="card-title">
-              <span class="text-white">Buat</span>
-              <span class="text-muted">Tagihan</span>
-            </h2>
           </div>
-        </div>
 
-        <p id="qrisWarning" class="warning-msg hidden" role="alert"></p>
+          <div id="createPanel" class="create-pane" aria-labelledby="createTitle">
+            <div class="pane-head">
+              <h3 id="createTitle" class="pane-title">Buat tagihan</h3>
+              <p class="pane-sub">Nominal langsung terkunci di QRIS.</p>
+            </div>
+
+            <p id="qrisWarning" class="warning-msg hidden" role="alert"></p>
 
         <form id="createForm" class="create-form">
           <div class="form-group">
@@ -582,11 +584,13 @@
         </form>
 
         <p class="hint">QRIS statis profil otomatis diubah menjadi QR dinamis nominal terkunci.</p>
+          </div>
+        </div>
       </section>
     </main>
 
-    <!-- History Card with Segmented Tabs -->
-    <section class="card history-card" aria-labelledby="billsTitle">
+    <!-- History -->
+    <section class="history-card" aria-labelledby="billsTitle">
       <div class="card-head-row">
         <div>
           <h2 id="billsTitle" class="card-title">
@@ -695,6 +699,11 @@
       </div>
 
       <div class="nav-drawer-body">
+        <div class="nav-profile-card">
+          <span class="nav-profile-label">Profil aktif</span>
+          <strong id="sidebarProfileName">Memuat…</strong>
+        </div>
+
         <nav class="nav-menu">
           <button type="button" class="nav-item" id="navHomeBtn">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
@@ -1523,6 +1532,6 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=48" defer></script>
+  <script src="/app.js?v=50" defer></script>
 </body>
 </html>
