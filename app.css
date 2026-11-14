@@ -1861,6 +1861,7 @@ code {
     position: fixed;
     left: 50%;
     bottom: calc(10px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
     z-index: 70;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
