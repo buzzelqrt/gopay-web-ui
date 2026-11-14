@@ -649,10 +649,24 @@ code {
   transition: padding 0.22s ease, gap 0.22s ease, background 0.22s ease;
 }
 
-/* Compact (icon-only) state when scrolled */
+/* Collapsed state when scrolled: show logo only */
 .topbar.is-scrolled {
   padding: 6px 10px;
   gap: 8px;
+  justify-content: center;
+}
+
+.topbar.is-scrolled .icon-btn,
+.topbar.is-scrolled .profile-badge-btn {
+  max-width: 0;
+  width: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-width 0.22s ease, width 0.22s ease, opacity 0.18s ease, padding 0.22s ease, margin 0.22s ease;
 }
 
 .topbar.is-scrolled .brand-name,
@@ -666,12 +680,32 @@ code {
   transition: max-width 0.22s ease, opacity 0.18s ease, margin 0.22s ease;
 }
 
+/* Expanded state when scrolled (hover/focus/click) */
+.topbar.is-scrolled.is-expanded,
 .topbar.is-scrolled:hover,
 .topbar.is-scrolled:focus-within {
   padding: 10px 14px;
   gap: 12px;
+  justify-content: space-between;
 }
 
+.topbar.is-scrolled.is-expanded .icon-btn,
+.topbar.is-scrolled.is-expanded .profile-badge-btn,
+.topbar.is-scrolled:hover .icon-btn,
+.topbar.is-scrolled:hover .profile-badge-btn,
+.topbar.is-scrolled:focus-within .icon-btn,
+.topbar.is-scrolled:focus-within .profile-badge-btn {
+  max-width: 40px;
+  width: 36px;
+  opacity: 1;
+  padding: 0;
+  border: 1px solid var(--border);
+  pointer-events: auto;
+}
+
+.topbar.is-scrolled.is-expanded .brand-name,
+.topbar.is-scrolled.is-expanded .badge-label,
+.topbar.is-scrolled.is-expanded .badge-val,
 .topbar.is-scrolled:hover .brand-name,
 .topbar.is-scrolled:hover .badge-label,
 .topbar.is-scrolled:hover .badge-val,
@@ -683,10 +717,7 @@ code {
   margin: inherit;
 }
 
-.topbar.is-scrolled .profile-badge-btn {
-  padding: 4px 8px;
-}
-
+.topbar.is-scrolled.is-expanded .profile-badge-btn,
 .topbar.is-scrolled:hover .profile-badge-btn,
 .topbar.is-scrolled:focus-within .profile-badge-btn {
   padding: 4px 10px;

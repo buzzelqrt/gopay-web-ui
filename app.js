@@ -1867,13 +1867,32 @@ function bindEvents() {
   if (navCloseBtn) navCloseBtn.addEventListener('click', closeNavDrawer);
   if (navBackdrop) navBackdrop.addEventListener('click', closeNavDrawer);
 
-  // Floating pill navbar: compact on scroll, expand on hover (CSS handles hover)
+  // Floating pill navbar: collapse to logo on scroll; expand on hover/click
   const topbar = document.querySelector('.topbar');
+  const setExpanded = (value) => {
+    if (!topbar) return;
+    topbar.classList.toggle('is-expanded', value);
+  };
   const updateTopbarScroll = () => {
     if (!topbar) return;
     if (window.scrollY > 40) topbar.classList.add('is-scrolled');
-    else topbar.classList.remove('is-scrolled');
+    else {
+      topbar.classList.remove('is-scrolled');
+      topbar.classList.remove('is-expanded');
+    }
   };
+  if (topbar) {
+    topbar.addEventListener('click', (event) => {
+      if (!topbar.classList.contains('is-scrolled')) return;
+      if (topbar.classList.contains('is-expanded')) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setExpanded(true);
+    });
+    document.addEventListener('click', (event) => {
+      if (!topbar.contains(event.target)) setExpanded(false);
+    });
+  }
   window.addEventListener('scroll', updateTopbarScroll, { passive: true });
   updateTopbarScroll();
 
