@@ -1867,6 +1867,16 @@ function bindEvents() {
   if (navCloseBtn) navCloseBtn.addEventListener('click', closeNavDrawer);
   if (navBackdrop) navBackdrop.addEventListener('click', closeNavDrawer);
 
+  // Floating pill navbar: compact on scroll, expand on hover (CSS handles hover)
+  const topbar = document.querySelector('.topbar');
+  const updateTopbarScroll = () => {
+    if (!topbar) return;
+    if (window.scrollY > 40) topbar.classList.add('is-scrolled');
+    else topbar.classList.remove('is-scrolled');
+  };
+  window.addEventListener('scroll', updateTopbarScroll, { passive: true });
+  updateTopbarScroll();
+
   const navHomeBtn = document.getElementById('navHomeBtn');
   if (navHomeBtn) {
     navHomeBtn.addEventListener('click', () => {

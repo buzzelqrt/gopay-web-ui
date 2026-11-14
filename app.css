@@ -621,21 +621,75 @@ code {
   width: 100%;
   max-width: 1060px;
   margin: 0 auto;
-  padding: 16px 16px 48px;
+  padding: 80px 16px 48px;
 }
 
 /* ── Topbar (NilovrAI style) ─────────────────────────────────── */
 
 .topbar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 10px 14px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: 20px;
+  border-radius: 999px;
+  margin-bottom: 0;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  transition: padding 0.22s ease, gap 0.22s ease, background 0.22s ease;
+}
+
+/* Compact (icon-only) state when scrolled */
+.topbar.is-scrolled {
+  padding: 6px 10px;
+  gap: 8px;
+}
+
+.topbar.is-scrolled .brand-name,
+.topbar.is-scrolled .badge-label,
+.topbar.is-scrolled .badge-val {
+  max-width: 0;
+  opacity: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.22s ease, opacity 0.18s ease, margin 0.22s ease;
+}
+
+.topbar.is-scrolled:hover,
+.topbar.is-scrolled:focus-within {
+  padding: 10px 14px;
+  gap: 12px;
+}
+
+.topbar.is-scrolled:hover .brand-name,
+.topbar.is-scrolled:hover .badge-label,
+.topbar.is-scrolled:hover .badge-val,
+.topbar.is-scrolled:focus-within .brand-name,
+.topbar.is-scrolled:focus-within .badge-label,
+.topbar.is-scrolled:focus-within .badge-val {
+  max-width: 220px;
+  opacity: 1;
+  margin: inherit;
+}
+
+.topbar.is-scrolled .profile-badge-btn {
+  padding: 4px 8px;
+}
+
+.topbar.is-scrolled:hover .profile-badge-btn,
+.topbar.is-scrolled:focus-within .profile-badge-btn {
+  padding: 4px 10px;
 }
 
 .topbar-left {
@@ -1594,13 +1648,14 @@ code {
 
 @media (max-width: 840px) {
   .shell {
-    padding: 12px 12px 40px;
+    padding: 72px 12px 40px;
     width: 100%;
     max-width: 100vw;
   }
 
   .topbar {
-    padding: 8px 12px;
+    padding: 6px 10px;
+    gap: 8px;
   }
 
   .main-title {
