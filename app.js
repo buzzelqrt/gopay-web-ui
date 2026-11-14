@@ -5,6 +5,9 @@ const STATUS_LABELS = {
   cancelled: 'Dibatalkan',
 };
 
+const EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+const EYE_OFF_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8a21.8 21.8 0 015.06-6.06"></path><path d="M9.9 4.24A10.94 10.94 0 0112 4c7 0 11 8 11 8a21.8 21.8 0 01-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 11-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+
 const SECURITY_LABELS = {
   login_ok: 'Masuk berhasil',
   login_fail: 'Percobaan masuk gagal',
@@ -18,7 +21,7 @@ const SECURITY_LABELS = {
   profile_delete: 'Profil dihapus',
   admin_ip_trusted: 'IP disetujui sebagai admin',
   profile_ip_trusted: 'IP disetujui untuk profil',
-  api_key_regenerated: 'API Key digenerate ulang',
+  api_key_regenerated: 'API key dibuat ulang',
   gopay_account_transfer: 'Nomor GoPay dipindahkan ke akun lain',
   password_reset_request: 'Permintaan reset password',
   password_reset: 'Password direset',
@@ -226,13 +229,13 @@ function formatRupiah(value) {
 
 function formatDate(value) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  if (Number.isNaN(date.getTime())) return '-';
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
 function formatTime(value) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  if (Number.isNaN(date.getTime())) return '-';
   return new Intl.DateTimeFormat('id-ID', { timeStyle: 'medium' }).format(date);
 }
 
@@ -317,7 +320,7 @@ function showHome() {
   if (el.gate) el.gate.hidden = true;
   if (el.home) el.home.hidden = false;
   syncHomeAuthUi();
-  document.title = 'GoPay Bill — Dashboard Tagihan QRIS';
+  document.title = 'GoPay Bill: Dashboard Tagihan QRIS';
   window.scrollTo(0, 0);
 }
 
@@ -361,7 +364,7 @@ function showGate(message, view) {
   if (el.profiles) el.profiles.hidden = true;
   if (el.registerScreen) el.registerScreen.hidden = true;
   if (el.gate) el.gate.hidden = false;
-  document.title = 'Masuk — GoPay Bill';
+  document.title = 'Masuk - GoPay Bill';
   showGateView(view || (message || window.location.pathname === '/login' ? 'login' : 'register'));
   if (message && el.gateError) {
     el.gateError.textContent = message;
@@ -673,7 +676,7 @@ async function showProfiles(message) {
   el.app.hidden = true;
   if (el.registerScreen) el.registerScreen.hidden = true;
   el.profiles.hidden = false;
-  document.title = 'Pilih profil — GoPay Bill';
+  document.title = 'Pilih profil - GoPay Bill';
   window.scrollTo(0, 0);
   finishBoot();
 
@@ -723,7 +726,7 @@ function renderProfiles(profiles) {
       pinBadge.className = 'pill idle';
       pinBadge.style.fontSize = '10px';
       pinBadge.style.marginLeft = '4px';
-      pinBadge.textContent = '🔒 PIN';
+      pinBadge.textContent = 'PIN';
       name.append(pinBadge);
     }
 
@@ -746,7 +749,7 @@ function renderProfiles(profiles) {
 
     const go = document.createElement('span');
     go.className = 'profile-go';
-    go.textContent = 'Buka →';
+    go.textContent = 'Buka';
 
     meta.append(pill, go);
     item.append(main, meta);
@@ -838,7 +841,7 @@ function showRegisterWizard() {
   el.app.hidden = true;
   el.profiles.hidden = true;
   if (el.registerScreen) el.registerScreen.hidden = false;
-  document.title = 'Daftar Merchant Baru — GoPay Bill';
+  document.title = 'Daftar Merchant Baru - GoPay Bill';
   window.scrollTo(0, 0);
   finishBoot();
   setWizardStep(1);
@@ -935,8 +938,7 @@ async function createProfile(event) {
     await api('/api/profiles', {
       method: 'POST',
       body,
-    });
-    toast('Profil merchant berhasil dibuat!', 'ok');
+    });        toast('Profil merchant dibuat.', 'ok');
     window.location.reload();
   } catch (err) {
     el.profileError.textContent = err.message;
@@ -1019,7 +1021,7 @@ async function startApp() {
   if (state.profile) el.profileChipText.textContent = state.profile.name;
 
   el.gateError.hidden = true;
-  document.title = 'Dashboard — GoPay Bill';
+  document.title = 'Dashboard - GoPay Bill';
   window.scrollTo(0, 0);
 
   await loadOverview(true);
@@ -1104,7 +1106,7 @@ function renderAccount() {
           : 'idle'
   }`;
 
-  el.acctMerchant.textContent = account.merchantId || '—';
+  el.acctMerchant.textContent = account.merchantId || '-';
   el.acctMethod.textContent = account.loginMethod === 'otp' ? 'Nomor HP + OTP' : 'Email + password';
   el.acctPhone.textContent = account.phone || 'Belum diisi';
   el.acctCache.textContent = account.hasCachedToken ? 'Tersimpan (per profil)' : 'Belum ada';
@@ -1307,9 +1309,9 @@ function renderBill(payload) {
   el.billAmount.textContent = formatRupiah(bill.amount);
   el.billRef.textContent = bill.ref;
   el.billCreated.textContent = formatDate(bill.created_at);
-  el.billPaidAt.textContent = bill.paid_at ? formatDate(bill.paid_at) : '—';
-  el.billTx.textContent = bill.tx_id || '—';
-  el.billChecked.textContent = bill.last_checked_at ? formatTime(bill.last_checked_at) : '—';
+  el.billPaidAt.textContent = bill.paid_at ? formatDate(bill.paid_at) : '-';
+  el.billTx.textContent = bill.tx_id || '-';
+  el.billChecked.textContent = bill.last_checked_at ? formatTime(bill.last_checked_at) : '-';
 
   el.billNote.textContent = bill.note || '';
   el.billNote.classList.toggle('hidden', !bill.note);
@@ -1580,7 +1582,7 @@ function renderTransactions(transactions) {
 
     const time = document.createElement('span');
     time.className = 'li-date';
-    time.textContent = tx.time ? formatTime(tx.time) : '—';
+    time.textContent = tx.time ? formatTime(tx.time) : '-';
 
     item.append(main, time);
     el.txList.append(item);
@@ -2086,7 +2088,7 @@ function bindEvents() {
       const url = `${window.location.origin}/api`;
       try {
         await navigator.clipboard.writeText(url);
-        toast('Base URL disalin ke clipboard!', 'ok');
+        toast('Base URL disalin.', 'ok');
       } catch {
         toast('Gagal menyalin Base URL', 'error');
       }
@@ -2107,12 +2109,12 @@ function bindEvents() {
       if (!state.apiKey) return;
       try {
         await navigator.clipboard.writeText(state.apiKey);
-        toast('API Key disalin ke clipboard!', 'ok');
+        toast('API key disalin.', 'ok');
       } catch {
         el.apiKeyDisplay.type = 'text';
         el.apiKeyDisplay.select();
         document.execCommand('copy');
-        toast('API Key disalin!', 'ok');
+        toast('API key disalin.', 'ok');
       }
     });
   }
@@ -2121,7 +2123,7 @@ function bindEvents() {
   if (el.regenerateApiKeyBtn) {
     el.regenerateApiKeyBtn.addEventListener('click', async () => {
       const ok = window.confirm(
-        'Yakin ingin membuat API Key baru? Kunci lama akan langsung tidak berlaku dan semua script yang menggunakannya harus diperbarui.'
+        'Buat API key baru? Kunci lama langsung tidak berlaku dan script yang memakainya harus diperbarui.'
       );
       if (!ok) return;
 
@@ -2132,7 +2134,7 @@ function bindEvents() {
           state.apiKey = data.api_key;
           if (el.apiKeyDisplay) el.apiKeyDisplay.value = data.api_key;
           renderDocSnippets(state.docsLang || 'curl');
-          toast(data.message || 'API Key baru berhasil dibuat!', 'ok');
+          toast(data.message || 'API key baru dibuat.', 'ok');
         }
       } catch (err) {
         toast(err.message, 'error');
@@ -2151,7 +2153,7 @@ function bindEvents() {
       const code = targetEl.textContent;
       try {
         await navigator.clipboard.writeText(code);
-        toast('Kode berhasil disalin ke clipboard!', 'ok');
+        toast('Kode disalin.', 'ok');
       } catch {
         toast('Gagal menyalin teks', 'error');
       }
@@ -2259,7 +2261,7 @@ function bindEvents() {
           method: 'POST',
           body,
         });
-        toast('Profil toko berhasil didaftarkan!', 'ok');
+        toast('Profil toko didaftarkan.', 'ok');
         window.location.href = '/';
       } catch (err) {
         if (el.wizError) {
@@ -2269,7 +2271,7 @@ function bindEvents() {
         toast(err.message, 'error');
       } finally {
         el.wizSubmitBtn.disabled = false;
-        el.wizSubmitBtn.textContent = 'Daftar & Buka Dashboard 🚀';
+        el.wizSubmitBtn.textContent = 'Daftar dan buka dashboard';
       }
     });
   }
@@ -2323,10 +2325,12 @@ function bindEvents() {
       if (!input) return;
       if (input.type === 'password') {
         input.type = 'text';
-        btn.textContent = '🙈';
+        btn.innerHTML = EYE_OFF_ICON;
+        btn.setAttribute('aria-label', 'Sembunyikan isian');
       } else {
         input.type = 'password';
-        btn.textContent = '👁️';
+        btn.innerHTML = EYE_ICON;
+        btn.setAttribute('aria-label', 'Lihat isian');
       }
     });
   });

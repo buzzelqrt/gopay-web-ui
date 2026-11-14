@@ -1,8 +1,4 @@
-/* ─────────────────────────────────────────────────────────────────────────────
-   GoPay Bill — Refined Dark UI (NilovrAI Palette & Dual-Tone Typography)
-   Zero AI-slop: No generic gradients, no emojis, no pulsing neon dots.
-   Mobile-locked: 0 horizontal overflow.
-   ───────────────────────────────────────────────────────────────────────────── */
+/* GoPay Bill: dark dashboard UI with a solid neutral palette and dual-tone headings. */
 
 :root {
   /* Solid Neutral Palette (Ref: NilovrAI - pure charcoal/black) */
@@ -2142,18 +2138,6 @@ code {
   padding: 26px;
 }
 
-.zass-basics-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.zass-bolt {
-  font-size: 18px;
-  color: #e28a6c;
-}
-
 .zass-card-title {
   font-size: 19px;
   font-weight: 700;
@@ -2339,51 +2323,6 @@ code {
 .zass-note-dot.green {
   background: #10b981;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-}
-
-/* Features Grid */
-.zass-features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.zass-feature-card {
-  background: #131724;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.zass-feature-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  margin-bottom: 4px;
-}
-
-.zass-feature-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #f8fafc;
-  margin: 0;
-}
-
-.zass-feature-desc {
-  font-size: 12.5px;
-  color: #94a3b8;
-  line-height: 1.5;
-  margin: 0;
 }
 
 /* Endpoint Route Header */
@@ -2676,9 +2615,6 @@ code {
     padding: 18px;
     border-radius: 20px;
   }
-  .zass-features-grid {
-    grid-template-columns: 1fr;
-  }
   .zass-box {
     flex-direction: column;
     align-items: stretch;
@@ -2813,11 +2749,14 @@ code {
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 6px;
-  font-size: 16px;
   line-height: 1;
   opacity: 0.6;
   transition: opacity 0.15s ease;
@@ -3172,15 +3111,13 @@ code {
 
 .home-features {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 40px;
 }
 
 .home-feature {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
 }
 
 .home-feature h3,
@@ -3203,16 +3140,18 @@ code {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
 }
 
 .home-steps li {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 20px;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  column-gap: 16px;
+  align-items: start;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .home-step-num {
@@ -3221,7 +3160,7 @@ code {
   justify-content: center;
   width: 26px;
   height: 26px;
-  margin-bottom: 14px;
+  margin-top: 2px;
   border-radius: var(--radius-pill);
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);

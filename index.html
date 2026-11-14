@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0b0c0d" />
-  <title>GoPay Bill — Dashboard Tagihan QRIS</title>
+  <title>GoPay Bill: Dashboard Tagihan QRIS</title>
   <meta name="description" content="GoPay Bill membuat tagihan QRIS dinamis, memeriksa mutasi masuk otomatis, dan merapikan riwayat pembayaran dalam satu dashboard." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app.css?v=47" />
+  <link rel="stylesheet" href="/app.css?v=48" />
 </head>
 <body class="is-booting">
   <!-- Boot Screen -->
@@ -51,19 +51,18 @@
     <main class="home-main">
       <section class="home-hero">
         <div class="home-hero-copy">
-          <span class="kicker">Dashboard tagihan QRIS</span>
-          <h1 class="home-title">Semua tagihan QRIS kamu, <em>di satu layar.</em></h1>
-          <p class="home-lede">GoPay Bill membuat QRIS dinamis untuk tiap tagihan, memeriksa mutasi masuk secara berkala, dan menandai pembayaran yang sudah lunas. Cocok untuk toko, jasa, atau usaha kecil yang menerima pembayaran QRIS tiap hari.</p>
+          <h1 class="home-title">Tagihan QRIS dan mutasi masuk, <em>tercatat otomatis.</em></h1>
+          <p class="home-lede">Buat QRIS dinamis untuk tiap tagihan, cek mutasi masuk, dan tandai pembayaran yang sudah lunas. Setiap profil merchant punya QRIS, tagihan, dan riwayat sendiri.</p>
           <div class="home-actions">
-            <button id="homeRegisterCta" class="btn primary" type="button">Buat akun gratis</button>
-            <a class="btn ghost" href="#cara-kerja">Lihat cara kerja</a>
+            <button id="homeRegisterCta" class="btn primary" type="button">Daftar dan buat profil</button>
+            <a class="btn ghost" href="#cara-kerja">Lihat alur kerja</a>
           </div>
           <p class="home-note">Daftar pakai email. Verifikasi 6 digit, lalu langsung masuk dashboard.</p>
         </div>
 
         <div class="home-panel" aria-hidden="true">
           <div class="home-panel-head">
-            <span class="kicker">Tagihan aktif</span>
+            <span class="kicker">Contoh tagihan</span>
             <span class="home-badge">Menunggu</span>
           </div>
           <p class="home-panel-amount">Rp 87.500</p>
@@ -82,8 +81,7 @@
 
       <section id="fitur" class="home-section">
         <div class="home-section-head">
-          <span class="kicker">Fitur</span>
-          <h2>Yang kamu dapat setelah daftar</h2>
+          <h2>Yang dipakai tiap hari</h2>
         </div>
         <div class="home-features">
           <article class="home-feature">
@@ -100,11 +98,11 @@
           </article>
           <article class="home-feature">
             <h3>Riwayat dan filter</h3>
-            <p>Cari tagihan lama berdasarkan status, nominal, atau catatan. Semua pembayaran tersimpan rapi.</p>
+            <p>Cari tagihan lama berdasarkan status, nominal, atau catatan. Setiap tagihan menyimpan waktu dibuat dan waktu dibayar.</p>
           </article>
           <article class="home-feature">
             <h3>API dan dokumentasi</h3>
-            <p>API key per profil untuk membuat tagihan dari aplikasi lain, lengkap dengan contoh cURL dan panduan integrasi.</p>
+            <p>API key per profil untuk membuat tagihan dari aplikasi lain. Contoh cURL, JavaScript, dan Python tersedia di dokumentasi.</p>
           </article>
           <article class="home-feature">
             <h3>Keamanan akun</h3>
@@ -115,40 +113,45 @@
 
       <section id="cara-kerja" class="home-section">
         <div class="home-section-head">
-          <span class="kicker">Cara kerja</span>
-          <h2>Tiga langkah, selesai.</h2>
+          <h2>Dari daftar sampai tagihan pertama</h2>
         </div>
         <ol class="home-steps">
           <li>
             <span class="home-step-num">1</span>
-            <h3>Daftar dan verifikasi email</h3>
-            <p>Isi nama, email, dan password. Masukkan kode 6 digit yang dikirim ke email untuk mengaktifkan akun.</p>
+            <div>
+              <h3>Daftar dan verifikasi email</h3>
+              <p>Isi nama, email, dan password. Masukkan kode 6 digit yang dikirim ke email untuk mengaktifkan akun.</p>
+            </div>
           </li>
           <li>
             <span class="home-step-num">2</span>
-            <h3>Hubungkan akun GoPay</h3>
-            <p>Buat profil merchant, tempel QRIS tokomu, lalu hubungkan akun GoBiz lewat kode OTP.</p>
+            <div>
+              <h3>Hubungkan akun GoPay</h3>
+              <p>Buat profil merchant, tempel QRIS tokomu, lalu hubungkan akun GoBiz lewat kode OTP.</p>
+            </div>
           </li>
           <li>
             <span class="home-step-num">3</span>
-            <h3>Buat tagihan dan pantau</h3>
-            <p>Tentukan nominal dan catatan. Status tagihan berubah sendiri begitu pembayaran masuk.</p>
+            <div>
+              <h3>Buat tagihan dan pantau</h3>
+              <p>Tentukan nominal dan catatan. Status tagihan berubah sendiri begitu pembayaran masuk.</p>
+            </div>
           </li>
         </ol>
       </section>
 
       <section class="home-band">
         <div>
-          <h2>Mulai dari satu tagihan.</h2>
-          <p>Gratis untuk dibuat, langsung dipakai setelah email diverifikasi.</p>
+          <h2>Buat tagihan pertama</h2>
+          <p>Daftar dengan email, verifikasi 6 digit, lalu buat profil merchant.</p>
         </div>
-        <button id="homeRegisterCtaBottom" class="btn primary" type="button">Daftar sekarang</button>
+        <button id="homeRegisterCtaBottom" class="btn primary" type="button">Daftar merchant</button>
       </section>
     </main>
 
     <footer class="home-footer">
       <span>GoPay Bill</span>
-      <span>Dashboard tagihan QRIS pribadi.</span>
+      <span>Dashboard tagihan QRIS untuk merchant kecil.</span>
       <span>© 2026</span>
     </footer>
   </section>
@@ -243,7 +246,11 @@
 
       <div class="profiles-action-box" style="margin-top: 16px;">
         <button id="btnGoToRegister" class="btn primary block" type="button">
-          ➕ Daftar Merchant / Toko Baru
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Daftar merchant baru
         </button>
       </div>
     </div>
@@ -298,7 +305,7 @@
 
           <div class="wizard-nav-row">
             <button id="wizCancelBtn" type="button" class="btn ghost">Kembali ke Profil</button>
-            <button id="wizStep1NextBtn" type="button" class="btn primary">Lanjut: Setup QRIS ➔</button>
+            <button id="wizStep1NextBtn" type="button" class="btn primary">Lanjut ke QRIS</button>
           </div>
         </div>
 
@@ -312,16 +319,16 @@
 
           <!-- Realtime QRIS Inspector Box -->
           <div id="wizQrisPreview" class="qris-inspector-box hidden">
-            <div class="inspector-badge">QRIS EMVCo Terdeteksi ✓</div>
+            <div class="inspector-badge">QRIS EMVCo terdeteksi</div>
             <div class="inspector-detail">
-              <div><span class="muted">Nama Toko:</span> <strong id="wizQrisMerchantName">—</strong></div>
-              <div><span class="muted">Kota:</span> <span id="wizQrisCity">—</span></div>
+              <div><span class="muted">Nama Toko:</span> <strong id="wizQrisMerchantName">-</strong></div>
+              <div><span class="muted">Kota:</span> <span id="wizQrisCity">-</span></div>
             </div>
           </div>
 
           <div class="wizard-nav-row">
-            <button id="wizStep2BackBtn" type="button" class="btn ghost">⬅ Kembali</button>
-            <button id="wizStep2NextBtn" type="button" class="btn primary">Lanjut: Atur PIN ➔</button>
+            <button id="wizStep2BackBtn" type="button" class="btn ghost">Kembali</button>
+            <button id="wizStep2NextBtn" type="button" class="btn primary">Lanjut ke PIN</button>
           </div>
         </div>
 
@@ -331,7 +338,12 @@
             <label for="wizPin">Buat PIN Keamanan <span class="muted">(4–6 Digit Angka, opsional)</span></label>
             <div class="input-with-eye">
               <input id="wizPin" name="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="Contoh: 123456" />
-              <button type="button" class="btn-toggle-eye" data-target="wizPin" aria-label="Lihat PIN">👁️</button>
+              <button type="button" class="btn-toggle-eye" data-target="wizPin" aria-label="Lihat PIN">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
             </div>
             <p class="hint">Kunci tokomu agar orang lain tidak bisa sembarangan membuka profil ini.</p>
           </div>
@@ -340,15 +352,20 @@
             <label for="wizPinConfirm">Ulangi PIN Keamanan</label>
             <div class="input-with-eye">
               <input id="wizPinConfirm" name="pin_confirm" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="Masukkan ulang PIN di atas" />
-              <button type="button" class="btn-toggle-eye" data-target="wizPinConfirm" aria-label="Lihat PIN">👁️</button>
+              <button type="button" class="btn-toggle-eye" data-target="wizPinConfirm" aria-label="Lihat PIN">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
             </div>
           </div>
 
           <p id="wizError" class="error-msg" role="alert" hidden></p>
 
           <div class="wizard-nav-row">
-            <button id="wizStep3BackBtn" type="button" class="btn ghost">⬅ Kembali</button>
-            <button id="wizSubmitBtn" type="submit" class="btn primary">Daftar &amp; Buka Dashboard 🚀</button>
+            <button id="wizStep3BackBtn" type="button" class="btn ghost">Kembali</button>
+            <button id="wizSubmitBtn" type="submit" class="btn primary">Daftar dan buka dashboard</button>
           </div>
         </div>
       </form>
@@ -471,7 +488,7 @@
             <div id="qrBox" class="qr-box">
               <div class="qr-empty">
                 <p class="qr-placeholder">Belum ada tagihan aktif. Isi nominal di formulir untuk membuat QRIS.</p>
-                <a class="text-link" href="#createPanel">Buat tagihan →</a>
+                <a class="text-link" href="#createPanel">Buat tagihan</a>
               </div>
             </div>
             <p class="qr-sub">Pindai QRIS dengan e-wallet atau mobile banking apa pun.</p>
@@ -666,7 +683,12 @@
           </svg>
           <span class="brand-name">GoPay<span class="brand-suffix">Bill</span></span>
         </div>
-        <button id="navCloseBtn" class="icon-btn" type="button" aria-label="Tutup menu">✕</button>
+        <button id="navCloseBtn" class="icon-btn" type="button" aria-label="Tutup menu">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
       <div class="nav-drawer-body">
@@ -786,7 +808,7 @@
               </div>
               <div class="help-text">
                 <strong>Modul GoBiz</strong>
-                <span>kavionn/gobiz-payment ↗</span>
+                <span>kavionn/gobiz-payment</span>
               </div>
             </a>
           </div>
@@ -801,16 +823,21 @@
         <!-- Header -->
         <div class="zass-docs-head">
           <div class="zass-head-info">
-            <h2 id="docsModalTitle" class="zass-docs-title">API Documentation</h2>
-            <p class="zass-docs-sub">Integrasi REST API untuk pembuatan tagihan QRIS dinamis otomatis dan pelacakan mutasi realtime.</p>
+            <h2 id="docsModalTitle" class="zass-docs-title">Dokumentasi API</h2>
+            <p class="zass-docs-sub">Endpoint untuk membuat tagihan QRIS dinamis, mengecek status pembayaran, dan membaca mutasi merchant.</p>
           </div>
-          <button id="docsModalCloseBtn" class="zass-close-btn" type="button" aria-label="Tutup dokumentasi">✕</button>
+          <button id="docsModalCloseBtn" class="zass-close-btn" type="button" aria-label="Tutup dokumentasi">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
         <!-- Pill Capsule Navigation Tabs -->
         <div class="zass-nav-wrap">
           <div class="zass-tab-capsule" id="docsNavTabs" role="tablist">
-            <button type="button" class="zass-nav-pill active" data-tab="overview">Overview</button>
+            <button type="button" class="zass-nav-pill active" data-tab="overview">Ringkasan</button>
             <button type="button" class="zass-nav-pill" data-tab="create">Buat Tagihan</button>
             <button type="button" class="zass-nav-pill" data-tab="check">Cek Status</button>
             <button type="button" class="zass-nav-pill" data-tab="list">Riwayat</button>
@@ -825,12 +852,9 @@
           <div id="tabDocsOverview" class="zass-tab-pane active">
             <!-- The Basics Card -->
             <section class="zass-card zass-basics-card">
-              <div class="zass-basics-header">
-                <span class="zass-bolt">⚡</span>
-                <h3 class="zass-card-title">The Basics</h3>
-              </div>
+              <h3 class="zass-card-title">Ringkasan API</h3>
               <p class="zass-card-desc">
-                Gunakan REST API GoPay Bill untuk membuat tagihan QRIS dinamis otomatis, mengecek status pembayaran secara realtime, dan mengelola transaksi secara programmatic. Semua endpoint terlindungi menggunakan autentikasi Kunci Rahasia (API Key).
+                Gunakan REST API GoPay Bill untuk membuat tagihan QRIS dinamis, mengecek status pembayaran, dan mengelola transaksi. Semua endpoint memakai API key.
               </p>
 
               <!-- Base URL Box -->
@@ -850,7 +874,7 @@
               <!-- API Key Box -->
               <div class="zass-box-group">
                 <div class="zass-box-label">
-                  API KEY &bull; PROFIL: <span id="docsProfileName" class="text-accent">—</span>
+                  API key untuk profil: <span id="docsProfileName" class="text-accent">-</span>
                 </div>
                 <div class="zass-box zass-key-box">
                   <input id="apiKeyDisplay" type="password" readonly class="zass-key-input mono" value="Memuat…" spellcheck="false" />
@@ -868,7 +892,7 @@
                       </svg>
                       <span>Salin</span>
                     </button>
-                    <button id="regenerateApiKeyBtn" class="zass-action-btn ghost" type="button" title="Generate API Key Baru">
+                    <button id="regenerateApiKeyBtn" class="zass-action-btn ghost" type="button" title="Buat API key baru">
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
                       </svg>
@@ -880,53 +904,15 @@
 
               <div class="zass-auth-note">
                 <span class="zass-note-dot"></span>
-                <span><strong>Autentikasi:</strong> Sertakan header HTTP <code class="code-inline">X-API-Key: &lt;key&gt;</code> atau <code class="code-inline">Authorization: Bearer &lt;key&gt;</code>. Request programmatic dengan API Key valid otomatis diizinkan tanpa batasan IP whitelist.</span>
+                <span><strong>Autentikasi:</strong> Sertakan header <code class="code-inline">X-API-Key: &lt;key&gt;</code> atau <code class="code-inline">Authorization: Bearer &lt;key&gt;</code>. API key yang valid dapat dipakai tanpa whitelist IP.</span>
               </div>
 
               <div class="zass-isolation-note">
                 <span class="zass-note-dot green"></span>
-                <span><strong>Isolasi Saldo &amp; Akun GoPay:</strong> Setiap profil merchant terhubung secara mandiri ke akun GoPay Merchant dan QRIS masing-masing. API Key Anda hanya terhubung ke toko Anda. Semua dana pembayaran tagihan dari API ini <strong>100% langsung masuk ke saldo GoPay Merchant Anda sendiri</strong>, bukan ke akun pengembang atau profil lain.</span>
+                <span><strong>Isolasi akun:</strong> Setiap profil merchant terhubung ke akun GoPay Merchant dan QRIS masing-masing. API key hanya berlaku untuk profil itu. Dana pembayaran masuk ke saldo GoPay Merchant milik profil tersebut, bukan ke akun pengembang atau profil lain.</span>
               </div>
             </section>
 
-            <!-- 3 Features Grid -->
-            <div class="zass-features-grid">
-              <div class="zass-feature-card">
-                <div class="zass-feature-icon">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <path d="M3 14h7v7H3z"></path>
-                  </svg>
-                </div>
-                <h4 class="zass-feature-title">QRIS Dinamis Otomatis</h4>
-                <p class="zass-feature-desc">Generate QRIS instan dengan nominal pesanan spesifik. Kompatibel dengan semua aplikasi e-wallet & mobile banking di Indonesia.</p>
-              </div>
-
-              <div class="zass-feature-card">
-                <div class="zass-feature-icon">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <polyline points="1 20 1 14 7 14"></polyline>
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                  </svg>
-                </div>
-                <h4 class="zass-feature-title">Pelacakan Mutasi Realtime</h4>
-                <p class="zass-feature-desc">Sistem memonitor mutasi masuk secara otomatis dan memperbarui status tagihan menjadi paid tanpa perlu polling berlebihan.</p>
-              </div>
-
-              <div class="zass-feature-card">
-                <div class="zass-feature-icon">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="16 18 22 12 16 6"></polyline>
-                    <polyline points="8 6 2 12 8 18"></polyline>
-                  </svg>
-                </div>
-                <h4 class="zass-feature-title">Multi Bahasa & SDK</h4>
-                <p class="zass-feature-desc">Contoh integrasi siap pakai untuk cURL, Node.js / JavaScript Fetch, dan Python Requests dengan API Key yang langsung terpasang.</p>
-              </div>
-            </div>
           </div>
 
           <!-- TAB 2: BUAT TAGIHAN -->
@@ -948,7 +934,7 @@
 
               <!-- Parameters -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Parameters</h4>
+                <h4 class="zass-block-title">Parameter</h4>
                 <div class="zass-table-card">
                   <table class="zass-table">
                     <thead>
@@ -980,7 +966,7 @@
               <!-- Request -->
               <div class="zass-section-block">
                 <div class="zass-block-header-row">
-                  <h4 class="zass-block-title">Request</h4>
+                  <h4 class="zass-block-title">Contoh request</h4>
                   <div class="zass-lang-capsule">
                     <button type="button" class="zass-lang-pill active" data-lang="curl">Curl</button>
                     <button type="button" class="zass-lang-pill" data-lang="js">Js</button>
@@ -1004,7 +990,7 @@
 
               <!-- Response -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Response</h4>
+                <h4 class="zass-block-title">Contoh response</h4>
 
                 <div class="zass-terminal-card">
                   <div class="zass-terminal-bar">
@@ -1067,7 +1053,7 @@
 
               <!-- Parameters -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Parameters</h4>
+                <h4 class="zass-block-title">Parameter</h4>
                 <div class="zass-table-card">
                   <table class="zass-table">
                     <thead>
@@ -1093,7 +1079,7 @@
               <!-- Request -->
               <div class="zass-section-block">
                 <div class="zass-block-header-row">
-                  <h4 class="zass-block-title">Request</h4>
+                  <h4 class="zass-block-title">Contoh request</h4>
                   <div class="zass-lang-capsule">
                     <button type="button" class="zass-lang-pill active" data-lang="curl">Curl</button>
                     <button type="button" class="zass-lang-pill" data-lang="js">Js</button>
@@ -1117,7 +1103,7 @@
 
               <!-- Response -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Response</h4>
+                <h4 class="zass-block-title">Contoh response</h4>
 
                 <div class="zass-terminal-card">
                   <div class="zass-terminal-bar">
@@ -1192,7 +1178,7 @@
               <!-- Request -->
               <div class="zass-section-block">
                 <div class="zass-block-header-row">
-                  <h4 class="zass-block-title">Request</h4>
+                  <h4 class="zass-block-title">Contoh request</h4>
                   <div class="zass-lang-capsule">
                     <button type="button" class="zass-lang-pill active" data-lang="curl">Curl</button>
                     <button type="button" class="zass-lang-pill" data-lang="js">Js</button>
@@ -1216,7 +1202,7 @@
 
               <!-- Response -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Response</h4>
+                <h4 class="zass-block-title">Contoh response</h4>
 
                 <div class="zass-terminal-card">
                   <div class="zass-terminal-bar">
@@ -1262,7 +1248,7 @@
 
               <!-- Parameters -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Parameters</h4>
+                <h4 class="zass-block-title">Parameter</h4>
                 <div class="zass-table-card">
                   <table class="zass-table">
                     <thead>
@@ -1288,7 +1274,7 @@
               <!-- Request -->
               <div class="zass-section-block">
                 <div class="zass-block-header-row">
-                  <h4 class="zass-block-title">Request</h4>
+                  <h4 class="zass-block-title">Contoh request</h4>
                   <div class="zass-lang-capsule">
                     <button type="button" class="zass-lang-pill active" data-lang="curl">Curl</button>
                     <button type="button" class="zass-lang-pill" data-lang="js">Js</button>
@@ -1312,7 +1298,7 @@
 
               <!-- Response -->
               <div class="zass-section-block">
-                <h4 class="zass-block-title">Response</h4>
+                <h4 class="zass-block-title">Contoh response</h4>
 
                 <div class="zass-terminal-card">
                   <div class="zass-terminal-bar">
@@ -1353,7 +1339,12 @@
         </div>
         <div class="drawer-head-actions">
           <span id="acctState" class="pill idle">Memuat</span>
-          <button id="drawerCloseBtn" class="icon-btn" type="button" aria-label="Tutup panel">✕</button>
+          <button id="drawerCloseBtn" class="icon-btn" type="button" aria-label="Tutup panel">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -1405,7 +1396,7 @@
         </form>
 
         <details id="editProfileSection" class="profile-create edit-profile-section" style="margin-top: 16px;">
-          <summary>⚙️ Pengaturan Profil &amp; QRIS Toko</summary>
+          <summary>Pengaturan profil dan QRIS toko</summary>
           <form id="editProfileForm" class="profile-form" style="margin-top: 12px;">
             <div class="form-group">
               <label for="editProfileName">Nama profil / toko</label>
@@ -1450,7 +1441,12 @@
   <div id="pinModalOverlay" class="custom-modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="custom-modal-card">
       <div class="custom-modal-head">
-        <div class="modal-icon-badge">🔒</div>
+        <div class="modal-icon-badge">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="4" y="11" width="16" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 018 0v4" />
+          </svg>
+        </div>
         <h2 id="pinModalTitle" class="title-serif">Kunci Keamanan PIN</h2>
         <p id="pinModalSub" class="text-sub">Profil <strong id="pinModalProfileName">Toko</strong> dilindungi PIN. Masukkan PIN untuk melanjutkan.</p>
       </div>
@@ -1459,7 +1455,12 @@
         <div class="form-group">
           <div class="input-with-eye">
             <input id="modalPinInput" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{4,6}" placeholder="4–6 Digit PIN" autocomplete="off" required />
-            <button type="button" class="btn-toggle-eye" data-target="modalPinInput" aria-label="Lihat PIN">👁️</button>
+            <button type="button" class="btn-toggle-eye" data-target="modalPinInput" aria-label="Lihat PIN">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -1474,6 +1475,6 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=46" defer></script>
+  <script src="/app.js?v=47" defer></script>
 </body>
 </html>
