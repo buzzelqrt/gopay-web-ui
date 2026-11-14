@@ -721,6 +721,12 @@ code {
   gap: 10px;
 }
 
+/* Flatten groups so the four pill items space evenly */
+.topbar-left,
+.topbar-right {
+  display: contents;
+}
+
 .profile-badge,
 .profile-badge-btn {
   display: flex;
