@@ -922,10 +922,15 @@ code {
 
 .card-head-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+}
+
+.card-head-row > div {
+  min-width: 0;
 }
 
 .card-title {
@@ -950,6 +955,7 @@ code {
 
 .workspace > .card,
 .bottom-grid > .card {
+  min-width: 0;
   margin-bottom: 0;
 }
 
@@ -1264,7 +1270,7 @@ code {
 
 .bottom-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: var(--space-5);
   margin-bottom: var(--space-5);
 }
