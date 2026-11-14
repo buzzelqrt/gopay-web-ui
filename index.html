@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0b0c0d" />
   <title>GoPay Bill: Dashboard Tagihan QRIS</title>
@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app.css?v=48" />
+  <link rel="stylesheet" href="/app.css?v=49" />
 </head>
 <body class="is-booting">
   <!-- Boot Screen -->
@@ -419,11 +419,14 @@
         <span class="text-white">Tagihan</span>
         <span class="text-muted">QRIS</span>
       </h1>
-      <p class="title-sub">Dashboard pembayaran GoPay Merchant.</p>
+      <p class="title-sub">Ringkasan tagihan dan mutasi masuk profil ini.</p>
     </section>
 
     <!-- Metrics Section -->
-    <section class="metrics-section" aria-label="Ringkasan">
+    <section class="metrics-section" aria-labelledby="ringkasanTitle">
+      <div class="section-top">
+        <h2 id="ringkasanTitle" class="section-kicker">Ringkasan</h2>
+      </div>
       <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-head">
@@ -1435,6 +1438,51 @@
       <p>GoPay Bill · Dashboard Tagihan QRIS</p>
       <p class="footer-sub">Modul: <a href="https://github.com/kavionn/gobiz-payment" target="_blank" rel="noreferrer">kavionn/gobiz-payment</a> · Pemakaian pribadi.</p>
     </footer>
+
+    <!-- Mobile bottom navigation -->
+    <nav class="mobile-tabbar" aria-label="Navigasi utama">
+      <button type="button" class="mobile-tab active" data-mobile-nav="top" aria-current="page">
+        <span class="mobile-tab-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 10.5L12 3l9 7.5" />
+            <path d="M5 9.5V21h14V9.5" />
+          </svg>
+        </span>
+        <span>Beranda</span>
+      </button>
+
+      <button type="button" class="mobile-tab mobile-tab-create" data-mobile-nav="create">
+        <span class="mobile-tab-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </span>
+        <span>Buat</span>
+      </button>
+
+      <button type="button" class="mobile-tab" data-mobile-nav="history">
+        <span class="mobile-tab-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+        </span>
+        <span>Riwayat</span>
+      </button>
+
+      <button type="button" class="mobile-tab" data-mobile-nav="account">
+        <span class="mobile-tab-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </span>
+        <span>Akun</span>
+      </button>
+    </nav>
   </div>
 
   <!-- Modal Input PIN Profil -->
@@ -1475,6 +1523,6 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=47" defer></script>
+  <script src="/app.js?v=48" defer></script>
 </body>
 </html>

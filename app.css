@@ -19,7 +19,7 @@
   --text-primary: #e2e4e8;
   --text-secondary: #9ea4af;
   --text-muted: #7c828d;
-  --text-dim: #50545c;
+  --text-dim: #757c87;
 
   /* Terracotta Accent (Ref: NilovrAI button & badge highlights) */
   --accent: #d97757;
@@ -56,6 +56,14 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-pill: 9999px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
 }
 
 /* ── Strict Anti-Overflow & Base Reset ───────────────────────── */
@@ -288,8 +296,8 @@ body.is-booting .profiles {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin-bottom: var(--space-4);
 }
 
 label {
@@ -615,9 +623,9 @@ code {
 
 .shell {
   width: 100%;
-  max-width: 1060px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 80px 16px 48px;
+  padding: 88px var(--space-5) 64px;
 }
 
 /* ── Topbar (NilovrAI style) ─────────────────────────────────── */
@@ -811,7 +819,7 @@ code {
 
 .main-title {
   font-family: var(--font-serif);
-  font-size: 2.2rem;
+  font-size: clamp(1.9rem, 4vw, 2.35rem);
   line-height: 1.15;
   margin: 0;
   display: flex;
@@ -839,9 +847,10 @@ code {
 }
 
 .section-kicker {
-  font-size: 11px;
+  margin: 0;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -849,17 +858,17 @@ code {
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .metric-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .metric-head {
@@ -881,9 +890,10 @@ code {
 }
 
 .metric-num {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--text-white);
   line-height: 1.2;
 }
@@ -900,33 +910,36 @@ code {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 .card-head-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .card-title {
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  line-height: 1.2;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3em;
+  align-items: baseline;
+  gap: 0.35em;
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 /* ── Cashier / Active Bill ───────────────────────────────────── */
@@ -1023,6 +1036,7 @@ code {
   font-family: var(--font-mono);
   font-size: 24px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--accent);
   margin: 0;
   line-height: 1.2;
@@ -1147,6 +1161,7 @@ code {
   font-family: var(--font-mono);
   font-size: 13.5px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--text-white);
   white-space: nowrap;
   overflow: hidden;
@@ -1180,8 +1195,8 @@ code {
 .bottom-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
 /* ── Left Navigation Drawer (Ref: s24jMCg9KC.png) ─────────────── */
@@ -1535,8 +1550,9 @@ code {
 }
 
 .drawer-title {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 700;
   color: var(--text-white);
   margin: 0;
 }
@@ -1673,7 +1689,7 @@ code {
 /* ── Footer ─────────────────────────────────────────────────── */
 
 .footer {
-  padding-top: 20px;
+  padding-top: var(--space-5);
   border-top: 1px solid var(--border);
   font-size: 11.5px;
   color: var(--text-dim);
@@ -1688,22 +1704,112 @@ code {
   text-decoration: underline;
 }
 
+/* ── Mobile bottom navigation ───────────────────────────────── */
+
+.mobile-tabbar {
+  display: none;
+}
+
+.mobile-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.mobile-tab:active {
+  transform: scale(0.97);
+}
+
+.mobile-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: inherit;
+}
+
+.mobile-tab.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+}
+
+.mobile-tab.active .mobile-tab-icon {
+  color: var(--accent);
+}
+
+.mobile-tab-create {
+  color: var(--accent);
+}
+
+.mobile-tab-create .mobile-tab-icon {
+  width: 38px;
+  height: 38px;
+  margin-top: -16px;
+  margin-bottom: 1px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 6px 16px var(--accent-soft);
+}
+
+.mobile-tab-create.active {
+  background: transparent;
+  color: var(--accent);
+}
+
+.mobile-tab-create.active .mobile-tab-icon {
+  background: var(--accent-hover);
+  color: var(--accent-text);
+}
+
 /* ── Mobile Layout (< 840px) ─────────────────────────────────── */
+
+#detailPanel,
+#createPanel,
+.history-card {
+  scroll-margin-top: 96px;
+}
 
 @media (max-width: 840px) {
   .shell {
-    padding: 72px 12px 40px;
+    padding: 76px var(--space-3) calc(112px + env(safe-area-inset-bottom));
     width: 100%;
     max-width: 100vw;
   }
 
   .topbar {
-    padding: 6px 10px;
+    top: 10px;
+    width: calc(100vw - 24px);
+    max-width: none;
+    padding: 8px 10px;
     gap: 8px;
+    border-radius: var(--radius-lg);
+  }
+
+  .brand-name {
+    font-size: 1.15rem;
   }
 
   .main-title {
-    font-size: 1.75rem;
+    font-size: 1.8rem;
+  }
+
+  .page-head {
+    margin-bottom: 18px;
   }
 
   .metrics-grid {
@@ -1716,16 +1822,18 @@ code {
   }
 
   .metric-num {
-    font-size: 19px;
+    font-size: 18px;
   }
 
-  .workspace {
+  .workspace,
+  .bottom-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: var(--space-4);
   }
 
   .cashier-layout {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
   .qr-box-wrap {
@@ -1734,17 +1842,62 @@ code {
     width: 100%;
   }
 
-  .bottom-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
   .card {
-    padding: 16px 14px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
   }
 
   .card-title {
-    font-size: 1.4rem;
+    font-size: 0.95rem;
+  }
+
+  #detailPanel,
+  #createPanel,
+  .history-card {
+    scroll-margin-top: 84px;
+  }
+
+  .mobile-tabbar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 70;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: min(430px, calc(100vw - 24px));
+    padding: 6px;
+    background: var(--surface);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .footer {
+    padding-bottom: var(--space-3);
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar .brand-name {
+    display: none;
+  }
+
+  .metric-num {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
 

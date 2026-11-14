@@ -1019,6 +1019,7 @@ async function startApp() {
   el.app.hidden = false;
   el.logoutBtn.hidden = false;
   if (state.profile) el.profileChipText.textContent = state.profile.name;
+  setActiveMobileTab('top');
 
   el.gateError.hidden = true;
   document.title = 'Dashboard - GoPay Bill';
@@ -1837,6 +1838,15 @@ print("Status:", data["bill"]["status"])`;
   }
 }
 
+function setActiveMobileTab(key) {
+  document.querySelectorAll('[data-mobile-nav]').forEach((item) => {
+    const isActive = item.dataset.mobileNav === key;
+    item.classList.toggle('active', isActive);
+    if (isActive) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  });
+}
+
 function bindEvents() {
   bindAuthEvents();
   el.logoutBtn.addEventListener('click', logout);
@@ -1875,8 +1885,14 @@ function bindEvents() {
     if (!topbar) return;
     topbar.classList.toggle('is-expanded', value);
   };
+  const isMobileViewport = () => window.matchMedia('(max-width: 840px)').matches;
   const updateTopbarScroll = () => {
     if (!topbar) return;
+    if (isMobileViewport()) {
+      topbar.classList.remove('is-scrolled');
+      topbar.classList.remove('is-expanded');
+      return;
+    }
     if (window.scrollY > 40) topbar.classList.add('is-scrolled');
     else {
       topbar.classList.remove('is-scrolled');
@@ -1896,6 +1912,7 @@ function bindEvents() {
     });
   }
   window.addEventListener('scroll', updateTopbarScroll, { passive: true });
+  window.addEventListener('resize', updateTopbarScroll);
   updateTopbarScroll();
 
   const navHomeBtn = document.getElementById('navHomeBtn');
@@ -1981,6 +1998,58 @@ function bindEvents() {
   if (el.accountBackdrop) {
     el.accountBackdrop.addEventListener('click', closeAccountDrawer);
   }
+
+  // Mobile bottom navigation
+  const mobileTabItems = document.querySelectorAll('[data-mobile-nav]');
+  mobileTabItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const key = item.dataset.mobileNav;
+      closeNavDrawer();
+      setActiveMobileTab(key);
+
+      if (key === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      if (key === 'account') {
+        openAccountDrawer();
+        return;
+      }
+
+      const target = document.querySelector(key === 'create' ? '#createPanel' : '.history-card');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      if (key === 'create') {
+        window.setTimeout(() => {
+          if (el.amount) el.amount.focus({ preventScroll: true });
+        }, 380);
+      }
+    });
+  });
+
+  let mobileTabTicking = false;
+  const syncMobileTabFromScroll = () => {
+    if (!isMobileViewport()) return;
+    if (el.accountPanel && !el.accountPanel.classList.contains('hidden')) return;
+
+    const createPanel = document.getElementById('createPanel');
+    const historyCard = document.querySelector('.history-card');
+    const marker = window.scrollY + 180;
+
+    if (historyCard && marker >= historyCard.offsetTop) setActiveMobileTab('history');
+    else if (createPanel && marker >= createPanel.offsetTop) setActiveMobileTab('create');
+    else setActiveMobileTab('top');
+  };
+
+  window.addEventListener('scroll', () => {
+    if (mobileTabTicking) return;
+    mobileTabTicking = true;
+    window.requestAnimationFrame(() => {
+      syncMobileTabFromScroll();
+      mobileTabTicking = false;
+    });
+  }, { passive: true });
 
   if (el.billFilterPills) {
     const pillButtons = el.billFilterPills.querySelectorAll('.tab-btn, .pill-btn');
