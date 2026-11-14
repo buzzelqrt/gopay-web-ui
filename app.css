@@ -669,6 +669,11 @@ code {
   transition: max-width 0.22s ease, width 0.22s ease, opacity 0.18s ease, padding 0.22s ease, margin 0.22s ease;
 }
 
+.topbar.is-scrolled .brand {
+  gap: 0;
+  justify-content: center;
+}
+
 .topbar.is-scrolled .brand-name,
 .topbar.is-scrolled .badge-label,
 .topbar.is-scrolled .badge-val {
@@ -687,6 +692,12 @@ code {
   padding: 10px 14px;
   gap: 12px;
   justify-content: space-between;
+}
+
+.topbar.is-scrolled.is-expanded .brand,
+.topbar.is-scrolled:hover .brand,
+.topbar.is-scrolled:focus-within .brand {
+  gap: 8px;
 }
 
 .topbar.is-scrolled.is-expanded .icon-btn,
